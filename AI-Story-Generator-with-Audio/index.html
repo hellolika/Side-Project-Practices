@@ -15,8 +15,8 @@
             transition: background-color 0.3s ease;
         }
         .story-text {
-            line-height: 1.8;
-            font-size: 1.125rem;
+            line-height: 2.0;
+            font-size: 1.25rem;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -35,33 +35,84 @@
         <!-- Header -->
         <header class="text-center mb-10">
             <h1 class="text-4xl font-bold text-indigo-600 mb-2">Magic Storyteller</h1>
-            <p class="text-slate-500">Enter a prompt, get a story with audio & visuals.</p>
+            <p class="text-slate-500">Generate stories in English or Khmer</p>
         </header>
 
         <!-- Input Section -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <div class="flex flex-col sm:flex-row gap-4">
-                <input type="text" 
-                    v-model="prompt"
-                    @keyup.enter="generateStory"
-                    placeholder="E.g., A brave rabbit who goes to space..." 
-                    class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+            <div class="flex flex-col gap-4">
                 
-                <select v-model="voice" class="px-4 py-3 rounded-xl border border-slate-300 bg-slate-50">
-                    <option value="Kore">Kore (Female)</option>
-                    <option value="Fenrir">Fenrir (Male)</option>
-                    <option value="Puck">Puck (Playful)</option>
-                </select>
+                <!-- Prompt Textarea with Copy/Clear Buttons -->
+                <div class="relative group">
+                    <textarea 
+                        ref="promptInput"
+                        v-model="prompt"
+                        @input="adjustHeight"
+                        @keydown.enter.exact.prevent="generateStory"
+                        :placeholder="language === 'en' ? 'E.g., A brave rabbit who goes to space... (Shift+Enter for new line)' : 'ឧទាហរណ៍៖ ទន្សាយដ៏ក្លាហានដែលទៅអវកាស...'" 
+                        class="w-full pl-4 pr-32 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none overflow-hidden min-h-[56px]"
+                        rows="1"
+                        style="height: auto;"
+                    ></textarea>
+                    
+                    <div class="absolute right-2 top-2 flex gap-1 items-center">
+                        
+                        <!-- Copied Notification -->
+                        <transition name="fade">
+                            <span v-if="showCopyFeedback" class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded mr-1">
+                                {{ language === 'en' ? 'Copied!' : 'បានចម្លង!' }}
+                            </span>
+                        </transition>
 
-                <button @click="generateStory" :disabled="isLoading"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span>{{ isLoading ? 'Generating...' : 'Generate' }}</span>
-                    <svg v-if="isLoading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </button>
+                        <!-- Copy Button -->
+                        <button @click="copyPrompt" 
+                            class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
+                            :title="language === 'en' ? 'Copy text' : 'ចម្លង'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Clear Button -->
+                        <button @click="clearPrompt" 
+                            class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                            :title="language === 'en' ? 'Clear text' : 'លុបអត្ថបទ'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Controls Row -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <!-- Language Select -->
+                    <select v-model="language" class="px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-700">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="km">🇰🇭 Khmer</option>
+                    </select>
+
+                    <!-- Voice Select -->
+                    <select v-model="voice" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 bg-slate-50">
+                        <option value="Kore">Kore (Female)</option>
+                        <option value="Fenrir">Fenrir (Male)</option>
+                        <option value="Puck">Puck (Playful)</option>
+                    </select>
+
+                    <!-- Generate Button -->
+                    <button @click="generateStory" :disabled="isLoading"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto w-full">
+                        <span>{{ isLoading ? 'Generating...' : (language === 'en' ? 'Generate' : 'បង្កើត') }}</span>
+                        <svg v-if="isLoading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
+            
             <div v-if="statusMsg" class="text-center mt-2 text-sm text-amber-600">
                 {{ statusMsg }}
             </div>
@@ -81,13 +132,13 @@
 
                 <!-- Story Content & Player -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
-                    <div class="story-text text-slate-700 mb-8">
+                    <div class="story-text text-slate-700 mb-8" :lang="language">
                         <span v-for="(segment, index) in story.segments" 
                               :key="index"
                               :id="'seg-' + index"
                               @click="playSegment(index)"
                               :class="{ 'highlight': currentIndex === index && isPlaying, 'hover:bg-slate-100': true }"
-                              class="transition-colors duration-200 cursor-pointer rounded mr-1">
+                              class="transition-colors duration-200 cursor-pointer rounded mr-1 inline-block">
                             {{ segment.text }}
                         </span>
                     </div>
@@ -96,10 +147,10 @@
                     <div class="flex items-center justify-center gap-4 pt-4 border-t border-slate-100">
                         <button @click="playStory" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            {{ isPlaying ? 'Restart' : 'Read Aloud' }}
+                            {{ isPlaying ? 'Restart' : (language === 'en' ? 'Read Aloud' : 'អាន') }}
                         </button>
                         <button @click="stopStory" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-full font-medium transition">
-                            Stop
+                            {{ language === 'en' ? 'Stop' : 'ឈប់' }}
                         </button>
                     </div>
                 </div>
@@ -115,14 +166,17 @@
                 // --- State ---
                 const prompt = ref('');
                 const voice = ref('Kore');
+                const language = ref('en'); // 'en' or 'km'
                 const isLoading = ref(false);
                 const statusMsg = ref('');
                 const story = ref(null);
+                const promptInput = ref(null);
+                const showCopyFeedback = ref(false);
                 
                 // Playback State
                 const isPlaying = ref(false);
                 const currentIndex = ref(-1);
-                let currentAudioObj = null; // Store Audio or Utterance object (non-reactive)
+                let currentAudioObj = null;
 
                 // --- Computed ---
                 const storyImageSrc = computed(() => {
@@ -134,22 +188,87 @@
 
                 // --- Methods ---
 
+                const adjustHeight = () => {
+                    if (promptInput.value) {
+                        promptInput.value.style.height = 'auto';
+                        promptInput.value.style.height = promptInput.value.scrollHeight + 'px';
+                    }
+                };
+
+                const triggerCopyFeedback = () => {
+                    showCopyFeedback.value = true;
+                    setTimeout(() => {
+                        showCopyFeedback.value = false;
+                    }, 2000);
+                };
+
+                const copyPrompt = async () => {
+                    if (!prompt.value) return;
+                    
+                    try {
+                        // 1. Try Modern Async Clipboard API
+                        await navigator.clipboard.writeText(prompt.value);
+                        triggerCopyFeedback();
+                    } catch (err) {
+                        // 2. Fallback to older execCommand method (works better in some restricted iframes)
+                        try {
+                            const textArea = document.createElement("textarea");
+                            textArea.value = prompt.value;
+                            
+                            // Ensure it's not visible but is part of the DOM
+                            textArea.style.position = "fixed";
+                            textArea.style.left = "-9999px";
+                            textArea.style.top = "0";
+                            document.body.appendChild(textArea);
+                            
+                            textArea.focus();
+                            textArea.select();
+                            
+                            const successful = document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            
+                            if (successful) {
+                                triggerCopyFeedback();
+                            } else {
+                                console.error("Fallback copy failed.");
+                            }
+                        } catch (fallbackErr) {
+                            console.error('Copy completely failed:', fallbackErr);
+                            // Only alert on complete failure
+                            alert(language.value === 'en' ? "Could not copy automatically. Please copy manually." : "មិនអាចចម្លងដោយស្វ័យប្រវត្តិ។ សូមចម្លងដោយដៃ។");
+                        }
+                    }
+                };
+
+                // NEW: Clear Prompt Method
+                const clearPrompt = () => {
+                    prompt.value = '';
+                    nextTick(() => {
+                        adjustHeight();
+                        if (promptInput.value) promptInput.value.focus();
+                    });
+                };
+
                 const generateStory = async () => {
                     if (!prompt.value) {
-                        alert("Please enter a prompt!");
+                        alert(language.value === 'en' ? "Please enter a prompt!" : "សូមបញ្ចូលប្រធានបទ!");
                         return;
                     }
 
                     isLoading.value = true;
                     statusMsg.value = '';
-                    stopStory(); // Reset player
-                    story.value = null; // Clear previous story
+                    stopStory(); 
+                    story.value = null;
 
                     try {
                         const response = await fetch('http://localhost:8000/generate', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ prompt: prompt.value, voice_name: voice.value })
+                            body: JSON.stringify({ 
+                                prompt: prompt.value, 
+                                voice_name: voice.value,
+                                language: language.value 
+                            })
                         });
 
                         if (!response.ok) throw new Error("Failed to generate story");
@@ -159,34 +278,43 @@
 
                     } catch (error) {
                         console.warn("Backend unavailable. Switching to Demo Mode.", error);
-                        statusMsg.value = "Backend not detected. Showing Demo Mode (Browser Speech).";
+                        statusMsg.value = language.value === 'en' 
+                            ? "Backend not detected. Showing Demo Mode."
+                            : "រកមិនឃើញម៉ាស៊ីនមេ។ បង្ហាញគំរូសាកល្បង។";
                         
-                        // Fake delay
                         await new Promise(r => setTimeout(r, 1000));
-                        
-                        story.value = generateFallbackData(prompt.value);
+                        story.value = generateFallbackData();
                     } finally {
                         isLoading.value = false;
                     }
                 };
 
-                const generateFallbackData = (userPrompt) => {
+                const generateFallbackData = () => {
+                    if (language.value === 'km') {
+                        return {
+                            title: "ការតភ្ជាប់សាកល្បង",
+                            image_base64: null,
+                            segments: [
+                                { text: "មើលទៅដូចជាម៉ាស៊ីនមេ Python មិនដំណើរការទេ។", audio_base64: null },
+                                { text: "យើងបានប្តូរទៅប្រើការអានរបស់កម្មវិធីអ៊ីនធឺណិតជំនួសវិញ។", audio_base64: null },
+                                { text: "អ្នកនៅតែអាចឃើញការដំណើរការនៃការអាន។", audio_base64: null },
+                                { text: "សូមរីករាយជាមួយការសាកល្បងនេះ!", audio_base64: null }
+                            ]
+                        }
+                    }
                     return {
-                        title: "The Vue 3 Demo",
+                        title: "The Demo Connection",
                         image_base64: null,
                         segments: [
-                            { text: "It looks like the Python backend isn't running.", audio_base64: null },
+                            { text: "It seems the backend server is not reachable.", audio_base64: null },
                             { text: "We have switched to browser-based speech synthesis.", audio_base64: null },
-                            { text: "This frontend is now built with Vue 3 and Tailwind CSS.", audio_base64: null },
-                            { text: "Enjoy the reactive highlighting effect!", audio_base64: null }
+                            { text: "This supports both English and Khmer fallback.", audio_base64: null }
                         ]
                     };
                 };
 
                 const playStory = () => {
-                    // Always start from beginning if 'Read Aloud' is clicked
                     stopStory();
-                    // Slight delay to ensure state reset before starting
                     setTimeout(() => playSegment(0), 100);
                 };
 
@@ -196,13 +324,10 @@
                         return;
                     }
 
-                    // Stop previous
                     stopAudioSource();
-
                     isPlaying.value = true;
                     currentIndex.value = index;
 
-                    // Scroll into view logic
                     nextTick(() => {
                         const el = document.getElementById(`seg-${index}`);
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -210,31 +335,41 @@
 
                     const segment = story.value.segments[index];
 
+                    // 1. Try Backend Audio (WAV)
                     if (segment.audio_base64) {
-                        // Backend Mode: WAV
                         const audio = new Audio(`data:audio/wav;base64,${segment.audio_base64}`);
                         currentAudioObj = audio;
                         audio.onended = () => playSegment(index + 1);
-                        audio.play().catch(e => console.error("Audio play error", e));
-                    } else {
-                        // Fallback Mode: Browser TTS
-                        const utterance = new SpeechSynthesisUtterance(segment.text);
-                        // Try to match selected voice roughly
-                        const voices = window.speechSynthesis.getVoices();
-                        if (voice.value === 'Kore') {
-                            utterance.voice = voices.find(v => v.name.includes('Female')) || voices[0];
-                        } else if (voice.value === 'Fenrir') {
-                            utterance.voice = voices.find(v => v.name.includes('Male')) || voices[0];
-                        }
-                        
-                        utterance.onend = () => {
-                            if (isPlaying.value) playSegment(index + 1);
-                        };
-                        
-                        currentAudioObj = utterance;
-                        window.speechSynthesis.speak(utterance);
+                        audio.play().catch(e => {
+                            console.error("Audio error, falling back to browser TTS", e);
+                            playBrowserTTS(segment.text, index);
+                        });
+                    } 
+                    // 2. Fallback to Browser TTS (Crucial for Khmer if backend TTS isn't perfect)
+                    else {
+                        playBrowserTTS(segment.text, index);
                     }
                 };
+
+                const playBrowserTTS = (text, index) => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    if (language.value === 'km') {
+                        utterance.lang = 'km-KH'; // Force Khmer locale
+                    } else {
+                        // Match English voices
+                        const voices = window.speechSynthesis.getVoices();
+                        if (voice.value === 'Kore') utterance.voice = voices.find(v => v.name.includes('Female')) || voices[0];
+                        else if (voice.value === 'Fenrir') utterance.voice = voices.find(v => v.name.includes('Male')) || voices[0];
+                    }
+
+                    utterance.onend = () => {
+                        if (isPlaying.value) playSegment(index + 1);
+                    };
+                    
+                    currentAudioObj = utterance;
+                    window.speechSynthesis.speak(utterance);
+                }
 
                 const stopAudioSource = () => {
                     if (currentAudioObj) {
@@ -254,18 +389,10 @@
                 };
 
                 return {
-                    prompt,
-                    voice,
-                    isLoading,
-                    statusMsg,
-                    story,
-                    storyImageSrc,
-                    isPlaying,
-                    currentIndex,
-                    generateStory,
-                    playStory,
-                    stopStory,
-                    playSegment
+                    prompt, voice, language,
+                    isLoading, statusMsg, story, storyImageSrc,
+                    isPlaying, currentIndex, promptInput, showCopyFeedback,
+                    generateStory, playStory, stopStory, playSegment, clearPrompt, copyPrompt, adjustHeight
                 };
             }
         }).mount('#app');
