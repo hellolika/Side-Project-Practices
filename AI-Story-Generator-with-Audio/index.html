@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Storyteller (Vue 3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .highlight {
+            background-color: #fde047; /* Yellow highlight */
+            color: black;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .story-text {
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        
+        /* Fade transition */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+
+    <div id="app" class="max-w-3xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">Magic Storyteller</h1>
+            <p class="text-slate-500">Enter a prompt, get a story with audio & visuals.</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" 
+                    v-model="prompt"
+                    @keyup.enter="generateStory"
+                    placeholder="E.g., A brave rabbit who goes to space..." 
+                    class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                
+                <select v-model="voice" class="px-4 py-3 rounded-xl border border-slate-300 bg-slate-50">
+                    <option value="Kore">Kore (Female)</option>
+                    <option value="Fenrir">Fenrir (Male)</option>
+                    <option value="Puck">Puck (Playful)</option>
+                </select>
+
+                <button @click="generateStory" :disabled="isLoading"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span>{{ isLoading ? 'Generating...' : 'Generate' }}</span>
+                    <svg v-if="isLoading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div v-if="statusMsg" class="text-center mt-2 text-sm text-amber-600">
+                {{ statusMsg }}
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <transition name="fade">
+            <div v-if="story" class="space-y-8">
+                
+                <!-- Image & Title -->
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">{{ story.title }}</h2>
+                    <div class="relative w-full max-w-lg mx-auto aspect-video rounded-2xl overflow-hidden shadow-lg bg-slate-200">
+                        <img :src="storyImageSrc" alt="Story Cover" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Story Content & Player -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                    <div class="story-text text-slate-700 mb-8">
+                        <span v-for="(segment, index) in story.segments" 
+                              :key="index"
+                              :id="'seg-' + index"
+                              @click="playSegment(index)"
+                              :class="{ 'highlight': currentIndex === index && isPlaying, 'hover:bg-slate-100': true }"
+                              class="transition-colors duration-200 cursor-pointer rounded mr-1">
+                            {{ segment.text }}
+                        </span>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center justify-center gap-4 pt-4 border-t border-slate-100">
+                        <button @click="playStory" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            {{ isPlaying ? 'Restart' : 'Read Aloud' }}
+                        </button>
+                        <button @click="stopStory" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-full font-medium transition">
+                            Stop
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                // --- State ---
+                const prompt = ref('');
+                const voice = ref('Kore');
+                const isLoading = ref(false);
+                const statusMsg = ref('');
+                const story = ref(null);
+                
+                // Playback State
+                const isPlaying = ref(false);
+                const currentIndex = ref(-1);
+                let currentAudioObj = null; // Store Audio or Utterance object (non-reactive)
+
+                // --- Computed ---
+                const storyImageSrc = computed(() => {
+                    if (story.value && story.value.image_base64) {
+                        return `data:image/png;base64,${story.value.image_base64}`;
+                    }
+                    return "https://via.placeholder.com/800x450?text=No+Image+Generated";
+                });
+
+                // --- Methods ---
+
+                const generateStory = async () => {
+                    if (!prompt.value) {
+                        alert("Please enter a prompt!");
+                        return;
+                    }
+
+                    isLoading.value = true;
+                    statusMsg.value = '';
+                    stopStory(); // Reset player
+                    story.value = null; // Clear previous story
+
+                    try {
+                        const response = await fetch('http://localhost:8000/generate', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: prompt.value, voice_name: voice.value })
+                        });
+
+                        if (!response.ok) throw new Error("Failed to generate story");
+
+                        const data = await response.json();
+                        story.value = data;
+
+                    } catch (error) {
+                        console.warn("Backend unavailable. Switching to Demo Mode.", error);
+                        statusMsg.value = "Backend not detected. Showing Demo Mode (Browser Speech).";
+                        
+                        // Fake delay
+                        await new Promise(r => setTimeout(r, 1000));
+                        
+                        story.value = generateFallbackData(prompt.value);
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const generateFallbackData = (userPrompt) => {
+                    return {
+                        title: "The Vue 3 Demo",
+                        image_base64: null,
+                        segments: [
+                            { text: "It looks like the Python backend isn't running.", audio_base64: null },
+                            { text: "We have switched to browser-based speech synthesis.", audio_base64: null },
+                            { text: "This frontend is now built with Vue 3 and Tailwind CSS.", audio_base64: null },
+                            { text: "Enjoy the reactive highlighting effect!", audio_base64: null }
+                        ]
+                    };
+                };
+
+                const playStory = () => {
+                    // Always start from beginning if 'Read Aloud' is clicked
+                    stopStory();
+                    // Slight delay to ensure state reset before starting
+                    setTimeout(() => playSegment(0), 100);
+                };
+
+                const playSegment = (index) => {
+                    if (!story.value || index >= story.value.segments.length) {
+                        stopStory();
+                        return;
+                    }
+
+                    // Stop previous
+                    stopAudioSource();
+
+                    isPlaying.value = true;
+                    currentIndex.value = index;
+
+                    // Scroll into view logic
+                    nextTick(() => {
+                        const el = document.getElementById(`seg-${index}`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+
+                    const segment = story.value.segments[index];
+
+                    if (segment.audio_base64) {
+                        // Backend Mode: WAV
+                        const audio = new Audio(`data:audio/wav;base64,${segment.audio_base64}`);
+                        currentAudioObj = audio;
+                        audio.onended = () => playSegment(index + 1);
+                        audio.play().catch(e => console.error("Audio play error", e));
+                    } else {
+                        // Fallback Mode: Browser TTS
+                        const utterance = new SpeechSynthesisUtterance(segment.text);
+                        // Try to match selected voice roughly
+                        const voices = window.speechSynthesis.getVoices();
+                        if (voice.value === 'Kore') {
+                            utterance.voice = voices.find(v => v.name.includes('Female')) || voices[0];
+                        } else if (voice.value === 'Fenrir') {
+                            utterance.voice = voices.find(v => v.name.includes('Male')) || voices[0];
+                        }
+                        
+                        utterance.onend = () => {
+                            if (isPlaying.value) playSegment(index + 1);
+                        };
+                        
+                        currentAudioObj = utterance;
+                        window.speechSynthesis.speak(utterance);
+                    }
+                };
+
+                const stopAudioSource = () => {
+                    if (currentAudioObj) {
+                        if (currentAudioObj instanceof Audio) {
+                            currentAudioObj.pause();
+                        } else if (currentAudioObj instanceof SpeechSynthesisUtterance) {
+                            window.speechSynthesis.cancel();
+                        }
+                        currentAudioObj = null;
+                    }
+                };
+
+                const stopStory = () => {
+                    stopAudioSource();
+                    isPlaying.value = false;
+                    currentIndex.value = -1;
+                };
+
+                return {
+                    prompt,
+                    voice,
+                    isLoading,
+                    statusMsg,
+                    story,
+                    storyImageSrc,
+                    isPlaying,
+                    currentIndex,
+                    generateStory,
+                    playStory,
+                    stopStory,
+                    playSegment
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
