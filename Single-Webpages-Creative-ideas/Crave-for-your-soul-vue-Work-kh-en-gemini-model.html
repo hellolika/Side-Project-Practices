@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Listener | Vue.js 3 Interactive Report</title>
+    <!-- Vue 3 Global Build -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals & Cinematic Darks (#F5F5F0, #1F2937, #C0A062) -->
+    <!-- Application Structure Plan: Vue 3 SPA using Composition API. State management for charts, audio, and UI transitions. -->
+    <!-- Visualization & Content Choices: Radar Chart (Discipline), Bar Chart (Action/Anxiety), Perspective Toggles (Soul/Body). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Icons replaced with Unicode. -->
+
+    <style>
+        body { background-color: #F5F5F0; color: #1F2937; font-family: 'Georgia', serif; }
+        h1, h2, h3 { font-family: 'Helvetica Neue', 'Arial', sans-serif; letter-spacing: -0.02em; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; max-height: 400px; }
+        .btn-cinematic { transition: all 0.3s ease; }
+        .btn-cinematic:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .fade-in { animation: fadeIn 1.2s ease-in; } 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .transcript-box { max-height: 350px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #C0A062 #F3F4F6; }
+        .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #C0A062; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <div id="app" v-cloak class="flex flex-col min-h-screen">
+        <!-- Hero Section -->
+        <header class="w-full py-16 px-6 text-center fade-in">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-gray-900 tracking-tighter uppercase">THE LISTENER</h1>
+            <p class="text-xl md:text-2xl text-gray-500 italic mb-8">"If you don't sing your song, who will?"</p>
+            <div class="w-24 h-1 bg-gray-800 mx-auto"></div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="container mx-auto px-4 md:px-8 max-w-7xl lg:grid lg:grid-cols-[1fr_380px] gap-12 mb-20">
+            
+            <main class="space-y-24">
+                <!-- Section 1: Discipline -->
+                <section id="discipline" class="fade-in">
+                    <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-gray-800 pl-4 mb-8">I. The Element of Hunger</h2>
+                    <div class="grid xl:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <p class="text-lg text-gray-700">Hunger is the "first element of self-discipline."</p>
+                            <button @click="toggleDiscipline" 
+                                    class="btn-cinematic w-full py-3 text-white font-semibold rounded"
+                                    :class="isDisciplined ? 'bg-[#C0A062]' : 'bg-gray-900'">
+                                {{ isDisciplined ? 'Reset Discipline' : 'Exercise Discipline' }}
+                            </button>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-lg">
+                            <div class="chart-container"><canvas ref="radarCanvas"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Identity -->
+                <section id="identity" class="fade-in">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-8 border-l-4 border-gray-800 pl-4">II. The Observer Strategy</h2>
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div :class="perspective === 'body' ? activeCardClass : inactiveCardClass" class="p-8 rounded-lg border transition-all duration-500">
+                            <h3 class="text-xl font-bold mb-4" :class="perspective === 'body' ? 'text-white' : 'text-gray-500'">The Container</h3>
+                            <p class="text-sm italic">Physical form and mortality.</p>
+                        </div>
+                        <div :class="perspective === 'soul' ? activeCardClass : inactiveCardClass" class="p-8 rounded-lg border transition-all duration-500">
+                            <h3 class="text-xl font-bold mb-4" :class="perspective === 'soul' ? 'text-[#C0A062]' : 'text-gray-500'">The Listener</h3>
+                            <p class="text-sm italic">The observer beyond the voice.</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <button @click="togglePerspective" class="text-sm border-b border-gray-800 pb-1 hover:text-gray-600">
+                            Invert Perspective
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 3: Action -->
+                <section id="action" class="fade-in">
+                    <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-[#C0A062] pl-4 mb-8">III. The Mechanism of Action</h2>
+                    <div class="grid xl:grid-cols-2 gap-12 items-center">
+                        <div class="bg-white p-4 rounded-xl shadow-lg">
+                            <div class="chart-container"><canvas ref="barCanvas"></canvas></div>
+                        </div>
+                        <div class="space-y-6">
+                            <button @click="takeAction" class="btn-cinematic w-full py-4 bg-[#C0A062] text-white font-bold text-lg rounded shadow-lg">
+                                Take Action
+                            </button>
+                            <p class="text-center font-bold text-gray-800">{{ anxiety }}% Anxiety | {{ freedom }}% Freedom</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Sidebar: Podcast -->
+            <aside class="mt-16 lg:mt-0">
+                <div class="lg:sticky lg:top-8 space-y-6">
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                        <div class="bg-gray-900 p-6 text-center">
+                            <div class="w-16 h-16 bg-[#C0A062] rounded-full mx-auto flex items-center justify-center mb-4 transition-transform duration-500"
+                                 :class="{ 'animate-pulse': isPlaying }">
+                                <span class="text-white text-3xl">{{ isPlaying ? '⏸' : '▶' }}</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg">Deep Dive: The Listener</h3>
+                            <p v-if="isGenerating" class="text-[#C0A062] text-xs mt-2">
+                                <span class="loading-spinner mr-2"></span>Generating Ghost Story...
+                            </p>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="flex items-center justify-between gap-4 mb-6">
+                                <div class="flex items-center gap-4 flex-grow">
+                                    <button @click="handlePlay" class="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center hover:bg-gray-100">
+                                        <span class="text-xl">{{ isPlaying ? '⏸' : '▶' }}</span>
+                                    </button>
+                                    <div class="flex-grow bg-gray-200 h-1 rounded-full relative">
+                                        <div :style="{ width: audioProgress + '%' }" class="absolute top-0 left-0 bg-[#C0A062] h-full transition-all duration-300"></div>
+                                    </div>
+                                </div>
+                                <button @click="handleDownload" 
+                                        :disabled="!currentAudioBlob"
+                                        class="p-2 transition-colors disabled:opacity-20"
+                                        title="Download .wav">
+                                    <span class="text-2xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500">
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
+</svg>
+
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="border-t border-gray-100 pt-4">
+                                <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">Transcript (Haunting Khmer)</h4>
+                                <div id="transcript" class="transcript-box space-y-4 pr-2 text-sm text-gray-600 leading-relaxed">
+                                    <p class="font-semibold text-gray-900">តែដោយការភ័យខ្លាចទើបមិនបានគិតដល់រឿងនេះ។ ប៉ុន្តែហេតុអីក៏ប៉ូលីសហាក់បីដូចជាដឹងរឿងរាវហើយក៏មិនមែនមានតែនាងម្នាក់ទេដែលជួបបុរសសុំទានម្នាក់នោះក្រោយពេលពួកគេស្លាប់។</p>
+                                    <p>តើអ្នកណាខ្លះដែលឆ្លងកាត់រឿងដូចនាងដែរទៅ។ ដេកមិនបានបាយមិនឆ្ងាញ់ទាល់តែទៅស្រោចទឹកនៅវត្តទើបបានបាត់ភាពភ័យខ្លាច។</p>
+                                    <p>និងចងខ្សែសីម៉ាក៏ដូចជាធ្វើបុណ្យខ្លះទើបចិត្តនាងស្ងប់៕</p>
+                                    <p>សង្ឃឹមថាវិញ្ញាណក្ខន្ធរបស់អ្នកទាំងនោះនឹងបានទៅកាន់សុគតិភព ហើយមិនមានអ្នកណាម្នាក់ទៀតត្រូវជួបគ្រោះភ័យបែបនេះឡើយ។</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="bg-gray-900 text-gray-400 py-12 text-center mt-auto">
+            <p class="font-serif italic text-lg mb-2">"Losing illusions is the start of awakening."</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted, computed, watch } = Vue;
+
+        createApp({
+            setup() {
+                // --- CONFIG ---
+                const apiKey = "AIzaSyAIgRz9mPQq-shN66T7uTjQf8sPGsjJ0VA"; 
+                const modelName = "gemini-2.5-flash-preview-tts";
+
+                // --- STATE ---
+                const isDisciplined = ref(false);
+                const perspective = ref('soul');
+                const anxiety = ref(85);
+                const freedom = ref(15);
+                const isPlaying = ref(false);
+                const audioProgress = ref(0);
+                const isGenerating = ref(false);
+                
+                const radarCanvas = ref(null);
+                const barCanvas = ref(null);
+                let radarChart = null;
+                let barChart = null;
+                let audioPlayer = new Audio();
+                const currentAudioBlob = ref(null);
+
+                // --- UI CLASSES ---
+                const activeCardClass = "bg-gray-900 border-gray-800 text-white shadow-xl transform scale-105";
+                const inactiveCardClass = "bg-gray-100 border-gray-200 text-gray-800";
+
+                // --- CHART LOGIC ---
+                onMounted(() => {
+                    // Radar Chart Init
+                    radarChart = new Chart(radarCanvas.value.getContext('2d'), {
+                        type: 'radar',
+                        data: {
+                            labels: ['Hunger', 'Discipline', 'Clarity', 'Willpower', 'Anxiety'],
+                            datasets: [{
+                                data: [20, 30, 40, 25, 90],
+                                backgroundColor: 'rgba(31, 41, 55, 0.2)',
+                                borderColor: '#1F2937'
+                            }]
+                        },
+                        options: { maintainAspectRatio: false, scales: { r: { suggestedMax: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+                    });
+
+                    // Bar Chart Init
+                    barChart = new Chart(barCanvas.value.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Anxiety', 'Freedom'],
+                            datasets: [{ data: [85, 15], backgroundColor: ['#1F2937', '#C0A062'] }]
+                        },
+                        options: { maintainAspectRatio: false, scales: { y: { max: 100, display: false } }, plugins: { legend: { display: false } } }
+                    });
+                });
+
+                const toggleDiscipline = () => {
+                    isDisciplined.value = !isDisciplined.value;
+                    radarChart.data.datasets[0].data = isDisciplined.value ? [95, 90, 85, 95, 20] : [20, 30, 40, 25, 90];
+                    radarChart.data.datasets[0].borderColor = isDisciplined.value ? '#C0A062' : '#1F2937';
+                    radarChart.update();
+                };
+
+                const takeAction = () => {
+                    if (anxiety.value > 10) {
+                        anxiety.value -= 20;
+                        freedom.value += 20;
+                        barChart.data.datasets[0].data = [anxiety.value, freedom.value];
+                        barChart.update();
+                    }
+                };
+
+                const togglePerspective = () => {
+                    perspective.value = perspective.value === 'soul' ? 'body' : 'soul';
+                };
+
+                // --- AUDIO LOGIC ---
+                const pcm16ToWav = (pcmData, sampleRate = 24000) => {
+                    const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+                    const view = new DataView(buffer);
+                    const writeString = (offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+                    writeString(0, 'RIFF');
+                    view.setUint32(4, 32 + pcmData.length * 2, true);
+                    writeString(8, 'WAVE');
+                    writeString(12, 'fmt ');
+                    view.setUint32(16, 16, true);
+                    view.setUint16(20, 1, true);
+                    view.setUint16(22, 1, true);
+                    view.setUint32(24, sampleRate, true);
+                    view.setUint32(28, sampleRate * 2, true);
+                    view.setUint16(32, 2, true);
+                    view.setUint16(34, 16, true);
+                    writeString(36, 'data');
+                    view.setUint32(40, pcmData.length * 2, true);
+                    for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+                    return new Blob([buffer], { type: 'audio/wav' });
+                };
+
+                const handlePlay = async () => {
+                    if (isGenerating.value) return;
+                    if (audioPlayer.src) {
+                        if (audioPlayer.paused) audioPlayer.play();
+                        else audioPlayer.pause();
+                        return;
+                    }
+
+                    try {
+                        isGenerating.value = true;
+                        const text = document.getElementById('transcript').innerText;
+                        
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: `Say this scary ghost story in a haunting, cinematic female voice with a clear Khmer accent and intonation: ${text}` }] }],
+                                generationConfig: {
+                                    responseModalities: ["AUDIO"],
+                                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Vindemiatrix" } } }
+                                }
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        const audioData = result.candidates[0].content.parts[0].inlineData.data;
+                        const binaryString = atob(audioData);
+                        const bytes = new Int16Array(binaryString.length / 2);
+                        for (let i = 0; i < binaryString.length; i += 2) {
+                            bytes[i / 2] = (binaryString.charCodeAt(i + 1) << 8) | binaryString.charCodeAt(i);
+                        }
+                        
+                        const blob = pcm16ToWav(bytes, 24000);
+                        currentAudioBlob.value = blob;
+                        audioPlayer.src = URL.createObjectURL(blob);
+                        audioPlayer.play();
+                    } catch (e) {
+                        console.error(e);
+                        alert("Audio generation failed. Check API key/connection.");
+                    } finally {
+                        isGenerating.value = false;
+                    }
+                };
+
+                const handleDownload = () => {
+                    if (!currentAudioBlob.value) return;
+                    const url = URL.createObjectURL(currentAudioBlob.value);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'scary_story_khmer.wav';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                // Sync Audio State
+                audioPlayer.onplay = () => isPlaying.value = true;
+                audioPlayer.onpause = () => isPlaying.value = false;
+                audioPlayer.ontimeupdate = () => {
+                    audioProgress.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
+                };
+
+                return {
+                    isDisciplined, perspective, anxiety, freedom, isPlaying, audioProgress, isGenerating,
+                    radarCanvas, barCanvas, toggleDiscipline, takeAction, togglePerspective, handlePlay, handleDownload,
+                    currentAudioBlob, activeCardClass, inactiveCardClass
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
