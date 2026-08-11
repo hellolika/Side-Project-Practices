@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Flow (Vue 3 Edition)</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: crosshair;
+        }
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        #app {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none; /* Let clicks pass through to canvas unless on UI */
+        }
+        .ui-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            user-select: none;
+            pointer-events: none;
+        }
+        .ui-item {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .highlight {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+        .interactive-btn {
+            pointer-events: auto;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.2s;
+            display: inline-block;
+        }
+        .interactive-btn:hover {
+            color: #fff;
+            transform: scale(1.02);
+        }
+        .interactive-btn:active {
+            transform: scale(0.98);
+        }
+        /* Fade transition for Vue */
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.5s;
+        }
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <!-- Canvas handled by Vue ref, but exists in DOM -->
+        <canvas ref="canvasRef"></canvas>
+
+        <div class="ui-panel">
+            <span class="ui-item">Move to create wind</span>
+            <span class="ui-item"><span class="highlight">Click & Hold</span> to compress gravity</span>
+            <span class="ui-item"><span class="highlight">Release</span> to detonate</span>
+            
+            <!-- Vue Interactive Component -->
+            <span class="ui-item interactive-btn" @click="switchFlower">
+                Double Click to bloom 
+                <span class="highlight">{{ currentFlowerName }}</span> 
+                ↻
+            </span>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+        createApp({
+            setup() {
+                // --- Vue State ---
+                const canvasRef = ref(null);
+                const flowerTypes = ['Sunflower', 'Rose', 'Daisy', 'Lily'];
+                const currentFlowerIndex = ref(0);
+
+                const currentFlowerName = computed(() => flowerTypes[currentFlowerIndex.value]);
+
+                const switchFlower = () => {
+                    currentFlowerIndex.value = (currentFlowerIndex.value + 1) % flowerTypes.length;
+                };
+
+                // --- Canvas Logic State (Non-reactive for performance) ---
+                // We don't use ref() for particles because Vue's proxy overhead 
+                // on 4000 objects per frame is too heavy.
+                let ctx = null;
+                let width = 0;
+                let height = 0;
+                let animationId = null;
+                let particles = [];
+                let flowers = [];
+                let mouse = { x: -1000, y: -1000, down: false };
+                let hue = 0;
+                let paletteIndex = 0;
+
+                // Configuration
+                const PARTICLE_COUNT = 4000;
+                const BASE_SPEED = 2;
+                const FRICTION = 0.96;
+                const COLOR_SPEED = 0.5;
+
+                const palettes = [
+                    { base: 180, range: 60, name: "Neon Cyan" },
+                    { base: 320, range: 60, name: "Cyber Punk" },
+                    { base: 30, range: 40, name: "Golden Hour" },
+                    { base: 100, range: 60, name: "Matrix" },
+                    { base: 0, range: 360, name: "Rainbow Chaos" }
+                ];
+
+                // --- Classes ---
+
+                class Flower {
+                    constructor(type) {
+                        this.type = type;
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.maxSize = Math.random() * 20 + 10;
+                        this.currentSize = 0;
+                        this.growthSpeed = Math.random() * 0.5 + 0.2;
+                        this.rotationOffset = Math.random() * Math.PI;
+                        this.life = 400;
+
+                        if (type === 'Sunflower') {
+                            this.petalCount = Math.floor(Math.random() * 5) + 10;
+                            this.petalColor = `hsl(${Math.random() * 15 + 45}, 100%, 50%)`;
+                            this.centerColor = `hsl(${Math.random() * 10 + 25}, 60%, 25%)`;
+                        } else if (type === 'Rose') {
+                            this.petalCount = 15;
+                            this.petalColor = `hsl(${Math.random() * 40 + 330}, 80%, 50%)`;
+                            this.centerColor = `hsl(${Math.random() * 20 + 330}, 90%, 30%)`;
+                        } else if (type === 'Daisy') {
+                            this.petalCount = Math.floor(Math.random() * 5) + 12;
+                            this.petalColor = `hsl(${Math.random() * 20 + 200}, 10%, 95%)`;
+                            this.centerColor = `hsl(${Math.random() * 10 + 45}, 100%, 50%)`;
+                        } else if (type === 'Lily') {
+                            this.petalCount = 6;
+                            this.petalColor = `hsl(${Math.random() * 60 + 260}, 70%, 70%)`;
+                            this.centerColor = `hsl(${Math.random() * 20 + 50}, 80%, 50%)`;
+                        }
+                    }
+
+                    update() {
+                        if (this.currentSize < this.maxSize) {
+                            this.currentSize += this.growthSpeed;
+                        }
+                        this.life--;
+                    }
+
+                    draw(context) {
+                        if (this.life <= 0) return;
+                        context.save();
+                        context.translate(this.x, this.y);
+                        context.rotate(this.rotationOffset);
+                        
+                        let alpha = 1;
+                        if (this.life < 50) alpha = this.life / 50;
+                        context.globalAlpha = alpha;
+
+                        if (this.type === 'Sunflower') this.drawSunflower(context);
+                        else if (this.type === 'Rose') this.drawRose(context);
+                        else if (this.type === 'Daisy') this.drawDaisy(context);
+                        else if (this.type === 'Lily') this.drawLily(context);
+
+                        context.restore();
+                    }
+
+                    drawSunflower(c) {
+                        c.fillStyle = this.petalColor;
+                        for (let i = 0; i < this.petalCount; i++) {
+                            c.save();
+                            c.rotate((Math.PI * 2 / this.petalCount) * i);
+                            c.beginPath();
+                            c.ellipse(0, this.currentSize * 1.2, this.currentSize * 0.4, this.currentSize * 1.2, 0, 0, Math.PI * 2);
+                            c.fill();
+                            c.restore();
+                        }
+                        c.fillStyle = this.centerColor;
+                        c.beginPath();
+                        c.arc(0, 0, this.currentSize, 0, Math.PI * 2);
+                        c.fill();
+                    }
+
+                    drawDaisy(c) {
+                        c.fillStyle = this.petalColor;
+                        for (let i = 0; i < this.petalCount; i++) {
+                            c.save();
+                            c.rotate((Math.PI * 2 / this.petalCount) * i);
+                            c.beginPath();
+                            c.ellipse(0, this.currentSize * 1.5, this.currentSize * 0.25, this.currentSize * 1.5, 0, 0, Math.PI * 2);
+                            c.fill();
+                            c.restore();
+                        }
+                        c.fillStyle = this.centerColor;
+                        c.beginPath();
+                        c.arc(0, 0, this.currentSize * 0.7, 0, Math.PI * 2);
+                        c.fill();
+                    }
+
+                    drawRose(c) {
+                        for (let i = 0; i < this.petalCount; i++) {
+                            c.save();
+                            let angle = i * 2.5;
+                            let dist = Math.sqrt(i) * (this.currentSize * 0.3);
+                            c.rotate(angle);
+                            c.translate(0, dist);
+                            c.fillStyle = i < 5 ? this.centerColor : this.petalColor;
+                            c.beginPath();
+                            let scale = 1 - (i/this.petalCount) * 0.2; 
+                            c.arc(0, 0, this.currentSize * 0.6 * scale, 0, Math.PI * 2);
+                            c.fill();
+                            c.strokeStyle = 'rgba(0,0,0,0.1)';
+                            c.lineWidth = 1;
+                            c.stroke();
+                            c.restore();
+                        }
+                    }
+
+                    drawLily(c) {
+                        c.fillStyle = this.petalColor;
+                        for (let i = 0; i < 6; i++) {
+                            c.save();
+                            c.rotate((Math.PI * 2 / 6) * i);
+                            c.beginPath();
+                            c.moveTo(0, 0);
+                            c.quadraticCurveTo(this.currentSize, this.currentSize * 1.5, 0, this.currentSize * 3);
+                            c.quadraticCurveTo(-this.currentSize, this.currentSize * 1.5, 0, 0);
+                            c.fill();
+                            c.strokeStyle = 'rgba(255,255,255,0.3)';
+                            c.beginPath();
+                            c.moveTo(0,0);
+                            c.lineTo(0, this.currentSize * 2.5);
+                            c.stroke();
+                            c.restore();
+                        }
+                        c.fillStyle = this.centerColor;
+                        for(let k=0; k<3; k++) {
+                             c.save();
+                             c.rotate((Math.PI * 2 / 3) * k + 0.5);
+                             c.beginPath();
+                             c.arc(0, this.currentSize * 0.8, this.currentSize * 0.15, 0, Math.PI * 2);
+                             c.fill();
+                             c.restore();
+                        }
+                    }
+                }
+
+                class Particle {
+                    constructor() {
+                        this.reset();
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                    }
+
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.vx = (Math.random() - 0.5) * BASE_SPEED;
+                        this.vy = (Math.random() - 0.5) * BASE_SPEED;
+                        this.size = Math.random() * 2 + 1;
+                        this.history = [];
+                        this.historyLimit = 5;
+                    }
+
+                    update() {
+                        this.history.push({x: this.x, y: this.y});
+                        if(this.history.length > this.historyLimit) this.history.shift();
+
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        this.vx *= FRICTION;
+                        this.vy *= FRICTION;
+
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (mouse.down) {
+                            if (distance > 10) {
+                                const force = 2000 / (distance * distance + 100);
+                                this.vx += (dx / distance) * force;
+                                this.vy += (dy / distance) * force;
+                            }
+                        } else {
+                            if (distance < 150) {
+                                const force = (150 - distance) / 150;
+                                const angle = Math.atan2(dy, dx);
+                                this.vx -= Math.cos(angle) * force * 1.5;
+                                this.vy -= Math.sin(angle) * force * 1.5;
+                            }
+                        }
+
+                        if (this.x < 0) this.x = width;
+                        if (this.x > width) this.x = 0;
+                        if (this.y < 0) this.y = height;
+                        if (this.y > height) this.y = 0;
+
+                        this.vx += (Math.random() - 0.5) * 0.05;
+                        this.vy += (Math.random() - 0.5) * 0.05;
+                    }
+
+                    draw(c) {
+                        const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+                        const currentPalette = palettes[paletteIndex];
+                        let p_hue = (currentPalette.base + (speed * 10)) % 360;
+                        if(currentPalette.name === "Rainbow Chaos") {
+                            p_hue = (this.x / width * 360 + hue) % 360;
+                        }
+                        
+                        const lightness = Math.min(50 + speed * 10, 80);
+                        const alpha = Math.min(speed * 0.3 + 0.1, 1);
+
+                        c.strokeStyle = `hsla(${p_hue}, 100%, ${lightness}%, ${alpha})`;
+                        c.lineWidth = this.size * 0.5;
+                        
+                        if (this.history.length > 1) {
+                            c.beginPath();
+                            c.moveTo(this.history[0].x, this.history[0].y);
+                            for (let i = 1; i < this.history.length; i++) {
+                                c.lineTo(this.history[i].x, this.history[i].y);
+                            }
+                            c.lineTo(this.x, this.y);
+                            c.stroke();
+                        } else {
+                            c.fillStyle = `hsla(${p_hue}, 100%, ${lightness}%, ${alpha})`;
+                            c.beginPath();
+                            c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                            c.fill();
+                        }
+                    }
+                }
+
+                // --- Methods ---
+
+                const resize = () => {
+                    if(!canvasRef.value) return;
+                    width = canvasRef.value.width = window.innerWidth;
+                    height = canvasRef.value.height = window.innerHeight;
+                };
+
+                const animate = () => {
+                    if (!ctx) return;
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                    ctx.fillRect(0, 0, width, height);
+
+                    hue += COLOR_SPEED;
+
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw(ctx);
+                    });
+
+                    for (let i = flowers.length - 1; i >= 0; i--) {
+                        flowers[i].update();
+                        flowers[i].draw(ctx);
+                        if (flowers[i].life <= 0) flowers.splice(i, 1);
+                    }
+
+                    animationId = requestAnimationFrame(animate);
+                };
+
+                const handleMouseMove = (e) => {
+                    mouse.x = e.clientX;
+                    mouse.y = e.clientY;
+                };
+
+                const handleMouseDown = (e) => {
+                    // Prevent triggering gravity if clicking UI
+                    if(e.target.closest('.interactive-btn')) return;
+                    mouse.down = true;
+                };
+
+                const handleMouseUp = () => {
+                    if (!mouse.down) return;
+                    mouse.down = false;
+                    // Explosion
+                    particles.forEach(p => {
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if(dist < 300) {
+                            const angle = Math.atan2(dy, dx);
+                            const force = (300 - dist) / 10;
+                            p.vx += Math.cos(angle) * force;
+                            p.vy += Math.sin(angle) * force;
+                        }
+                    });
+                };
+
+                const handleDoubleClick = () => {
+                    // Access Vue state value inside standard JS logic
+                    const type = flowerTypes[currentFlowerIndex.value];
+                    for(let i = 0; i < 50; i++) {
+                        flowers.push(new Flower(type));
+                    }
+                };
+                
+                const handleKeyDown = (e) => {
+                    if (e.key.toLowerCase() === 'f') {
+                        switchFlower();
+                    }
+                };
+
+                // --- Lifecycle Hooks ---
+                onMounted(() => {
+                    ctx = canvasRef.value.getContext('2d');
+                    resize();
+                    
+                    // Initialize Particles
+                    for (let i = 0; i < PARTICLE_COUNT; i++) {
+                        particles.push(new Particle());
+                    }
+
+                    window.addEventListener('resize', resize);
+                    window.addEventListener('mousemove', handleMouseMove);
+                    window.addEventListener('mousedown', handleMouseDown);
+                    window.addEventListener('mouseup', handleMouseUp);
+                    window.addEventListener('dblclick', handleDoubleClick);
+                    window.addEventListener('keydown', handleKeyDown);
+
+                    // Touch support
+                    window.addEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                        mouse.x = e.touches[0].clientX;
+                        mouse.y = e.touches[0].clientY;
+                    }, {passive: false});
+                    
+                    window.addEventListener('touchstart', (e) => {
+                        if(e.target.closest('.interactive-btn')) return;
+                        e.preventDefault();
+                        mouse.down = true;
+                        mouse.x = e.touches[0].clientX;
+                        mouse.y = e.touches[0].clientY;
+                    }, {passive: false});
+
+                    window.addEventListener('touchend', handleMouseUp);
+
+                    animate();
+                });
+
+                onUnmounted(() => {
+                    cancelAnimationFrame(animationId);
+                    window.removeEventListener('resize', resize);
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('mousedown', handleMouseDown);
+                    window.removeEventListener('mouseup', handleMouseUp);
+                    window.removeEventListener('dblclick', handleDoubleClick);
+                    window.removeEventListener('keydown', handleKeyDown);
+                });
+
+                return {
+                    canvasRef,
+                    currentFlowerName,
+                    switchFlower
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

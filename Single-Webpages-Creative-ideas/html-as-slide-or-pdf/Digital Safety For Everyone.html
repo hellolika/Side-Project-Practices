@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ការណែនាំអំពីសុវត្ថិភាពឌីជីថល</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;700&family=Freehand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            background-color: #cbd5e1;
+            margin: 0;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            font-family: 'Kantumruy Pro', sans-serif;
+            color: var(--text);
+        }
+
+        .slide {
+            width: 1000px;
+            height: 600px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 50px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Slide Themes */
+        .slide-intro { background: linear-gradient(135deg, #075985 0%, #0c4a6e 100%); color: white; justify-content: center; align-items: center; text-align: center; }
+        .slide-warning { border-top: 10px solid var(--danger); }
+        .slide-success { border-top: 10px solid var(--secondary); }
+        .slide-info { border-top: 10px solid var(--primary); }
+
+        /* Typography */
+        h1 { font-size: 48px; margin: 0 0 20px 0; line-height: 1.3; }
+        h2 { font-size: 32px; color: var(--primary); margin: 0 0 25px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        h3 { font-size: 24px; margin: 0 0 15px 0; color: #334155; }
+        p { font-size: 20px; line-height: 1.6; margin-bottom: 15px; }
+
+        /* Content Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        
+        .icon-box {
+            background: #f1f5f9;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .icon-box i { font-size: 40px; color: var(--primary); margin-bottom: 15px; }
+        .icon-box h4 { margin: 10px 0; font-size: 20px; }
+        .icon-box p { font-size: 16px; margin: 0; }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .alert-box {
+            background: #fef2f2;
+            border-left: 5px solid var(--danger);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .step-list { list-style: none; padding: 0; }
+        .step-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        /* Visual Decor */
+        .blob { position: absolute; z-index: 0; opacity: 0.1; }
+
+        /* Page Numbering */
+        .page-num { position: absolute; bottom: 20px; right: 30px; font-size: 14px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Cover -->
+<div class="slide slide-intro">
+    <div style="font-size: 80px; margin-bottom: 30px;"><i class="fa-solid fa-shield-heart"></i></div>
+    <h1>ការរក្សាសុវត្ថិភាពក្នុងពិភពឌីជីថល</h1>
+    <p style="font-size: 24px; opacity: 0.9;">មគ្គុទ្ទេសក៍សម្រាប់មនុស្សគ្រប់គ្នា</p>
+    <div style="width: 80px; height: 4px; background: white; margin: 30px 0;"></div>
+    <p>ជំហានងាយៗដើម្បីសម្គាល់ការបោកប្រាស់ ទប់ស្កាត់ AI ក្លែងក្លាយ និងការពារក្រុមគ្រួសាររបស់អ្នក។</p>
+    <div class="page-num">ទំព័រ ១</div>
+</div>
+
+<!-- Slide 2: The Internet Context -->
+<div class="slide slide-info">
+    <h2>អ៊ីនធឺណិតមានប្រយោជន៍ ប៉ុន្តែក៏មានចោរដែរ</h2>
+    <div class="grid-2">
+        <div>
+            <p>ការបោកប្រាស់មិនមែនគ្រាន់តែជាសំណាងអាក្រក់នោះទេ។</p>
+            <div class="icon-box" style="text-align: left; background: #e0f2fe;">
+                <p><strong>ការបោកប្រាស់ (Fraud):</strong> គឺជាពេលដែលនរណាម្នាក់ប្រើល្បិចបញ្ឆោតអ្នក ដើម្បីលួចយកប្រាក់ ឬអត្តសញ្ញាណរបស់អ្នក។</p>
+            </div>
+            <p style="margin-top: 20px;">កាលពីមុន ចោរលួចកាបូប។ តែសព្វថ្ងៃ ពួកគេប្រើប្រាស់កុំព្យូទ័រ និងក្រុមរៀបចំច្បាស់លាស់ដើម្បីលួចព័ត៌មានឌីជីថល។</p>
+        </div>
+        <div style="text-align: center;">
+            <i class="fa-solid fa-user-secret" style="font-size: 150px; color: #cbd5e1;"></i>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ២</div>
+</div>
+
+<!-- Slide 3: Scammer Masks -->
+<div class="slide">
+    <h2>មុខមាត់ផ្សេងៗរបស់អ្នកបោកប្រាស់</h2>
+    <div class="grid-3">
+        <div class="icon-box">
+            <i class="fa-solid fa-wallet"></i>
+            <h4>ចោរលួចកាបូប</h4>
+            <p>លួចលុយពីកម្មវិធីធនាគាររបស់អ្នក</p>
+        </div>
+        <div class="icon-box">
+            <i class="fa-solid fa-mask"></i>
+            <h4>អ្នកបន្លំខ្លួន</h4>
+            <p>ធ្វើពុតជាអ្នក ដើម្បីបើកគណនីក្លែងក្លាយ</p>
+        </div>
+        <div class="icon-box">
+            <i class="fa-solid fa-link-slash"></i>
+            <h4>អន្ទាក់ឌីជីថល</h4>
+            <p>ផ្ញើតំណភ្ជាប់ (Link) ក្លែងក្លាយ និងមេរោគ</p>
+        </div>
+    </div>
+    <div class="grid-2" style="margin-top: 30px;">
+        <div class="icon-box" style="flex-direction: row; display: flex; gap: 20px; align-items: center; text-align: left;">
+            <i class="fa-solid fa-store"></i>
+            <div>
+                <h4>អាជីវកម្មក្លែងក្លាយ</h4>
+                <p>លក់ទំនិញដែលមិនមានពិតប្រាកដ</p>
+            </div>
+        </div>
+        <div class="icon-box" style="flex-direction: row; display: flex; gap: 20px; align-items: center; text-align: left;">
+            <i class="fa-solid fa-masks-theater"></i>
+            <div>
+                <h4>អ្នកសម្ដែង</h4>
+                <p>ប្រើប្រាស់អារម្មណ៍របស់អ្នកដើម្បីឱ្យអ្នកទុកចិត្ត</p>
+            </div>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ៣</div>
+</div>
+
+<!-- Slide 4: AI Threat -->
+<div class="slide slide-warning">
+    <div class="tag">ការគំរាមកំហែងថ្មី</div>
+    <h2>គ្រោះថ្នាក់ពី AI: កុំជឿលើអ្វីដែលអ្នកឃើញ</h2>
+    <p>បច្ចេកវិទ្យាកាន់តែទំនើប។ ជនខិលខូចប្រើប្រាស់បញ្ញាសិប្បនិម្មិត (AI) ដើម្បីបង្កើត <strong>Deepfakes</strong>។</p>
+    <div class="grid-2">
+        <div class="icon-box" style="background: #fff7ed; border: 1px solid #ffedd5;">
+            <i class="fa-solid fa-microphone-lines" style="color: var(--accent);"></i>
+            <h4>សំឡេងក្លែងក្លាយ</h4>
+            <p>កុំព្យូទ័រអាចចម្លងសំឡេងសាច់ញាតិរបស់អ្នក ដើម្បីសុំជំនួយ។</p>
+        </div>
+        <div class="icon-box" style="background: #fff7ed; border: 1px solid #ffedd5;">
+            <i class="fa-solid fa-video-slash" style="color: var(--accent);"></i>
+            <h4>មុខក្លែងក្លាយ</h4>
+            <p>ការហៅវីដេអូអាចមើលទៅដូចមិត្តភក្តិ តែតាមពិតវាជាតម្រងឌីជីថលលើមុខអ្នកដទៃ។</p>
+        </div>
+    </div>
+    <div class="alert-box">
+        <p style="margin: 0; color: var(--danger);"><strong>ការព្រមាន៖</strong> គ្រាន់តែវាបង្ហាញលើអេក្រង់ មិនមែនមានន័យថាវាជាការពិតនោះទេ។</p>
+    </div>
+    <div class="page-num">ទំព័រ ៤</div>
+</div>
+
+<!-- Slide 5: The Trust Trick -->
+<div class="slide">
+    <h2>ល្បិចបោកបញ្ឆោតតាមអារម្មណ៍</h2>
+    <p>អ្នកបោកប្រាស់ដឹងថាអ្នកមានចិត្តល្អ។ ពួកគេមិន "Hack" ទូរស័ព្ទអ្នកទេ តែពួកគេ "Hack" ចិត្តរបស់អ្នក។</p>
+    <div class="grid-3" style="margin-top: 30px;">
+        <div style="text-align: center;">
+            <div style="font-size: 50px; color: var(--danger); margin-bottom: 10px;"><i class="fa-solid fa-bolt"></i></div>
+            <h3 style="color: var(--danger);">ការភ័យខ្លាច</h3>
+            <p style="font-size: 16px;">"គណនីរបស់អ្នកត្រូវបានបិទ!"</p>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 50px; color: var(--accent); margin-bottom: 10px;"><i class="fa-solid fa-gift"></i></div>
+            <h3 style="color: var(--accent);">ការរំភើប</h3>
+            <p style="font-size: 16px;">"អ្នកបានឈ្នះរង្វាន់ធំ!"</p>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 50px; color: var(--primary); margin-bottom: 10px;"><i class="fa-solid fa-hand-holding-heart"></i></div>
+            <h3 style="color: var(--primary);">ការអាណិត</h3>
+            <p style="font-size: 16px;">"ខ្ញុំមានបញ្ហា ត្រូវការជំនួយបន្ទាន់"</p>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ៥</div>
+</div>
+
+<!-- Slide 6: Red Flags -->
+<div class="slide slide-warning">
+    <h2>សញ្ញាព្រមាន៖ របៀបសម្គាល់ការកុហក</h2>
+    <div class="grid-2">
+        <ul class="step-list">
+            <li>
+                <div class="step-number" style="background: var(--danger);">១</div>
+                <div>
+                    <strong>ភាពបន្ទាន់ខ្លាំង៖</strong> គេបង្ខំឱ្យអ្នកបង់លុយ "ឥឡូវនេះ"។ ធនាគារពិតប្រាកដមិនដែលបង្ខំអ្នកឡើយ។
+                </div>
+            </li>
+            <li>
+                <div class="step-number" style="background: var(--danger);">២</div>
+                <div>
+                    <strong>ការសម្ងាត់៖</strong> គេប្រាប់ថា "កុំប្រាប់នរណាម្នាក់ឱ្យសោះ"។
+                </div>
+            </li>
+            <li>
+                <div class="step-number" style="background: var(--danger);">៣</div>
+                <div>
+                    <strong>សំណើ-ចម្លែកៗ៖</strong> គេសុំពាក្យសម្ងាត់ ឬលេខកូដ OTP (លេខកូដ ៤ ឬ ៦ ខ្ទង់ដែលផ្ញើរទៅកាន់លេខទូរស័ព្ទដៃអ្នក)។
+                </div>
+            </li>
+            <li>
+                <div class="step-number" style="background: var(--danger);">៤</div>
+                <div>
+                    <strong>កំហុសឆ្គង៖</strong> ប្រើអក្ខរាវិរុទ្ធខុស ឬសំឡេងដូចរ៉ូបូត។
+                </div>
+            </li>
+        </ul>
+        <div style="text-align: center; background: #fff1f2; padding: 40px; border-radius: 20px;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 100px; color: var(--danger);"></i>
+            <h3 style="margin-top: 20px; color: var(--danger);">បន្ទាន់!</h3>
+            <p>ផ្ញើពាក្យសម្ងាត់មកឥឡូវនេះ បើមិនដូច្នោះទេអ្នកនឹងបាត់បង់លុយ!</p>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ៦</div>
+</div>
+
+<!-- Slide 7: The Deepfake Test -->
+<div class="slide slide-success">
+    <h2>វិធីសាកល្បង Deepfake</h2>
+    <p>ប្រសិនបើអ្នកទទួលបានការហៅជាវីដេអូ ឬសំឡេងសុំលុយ៖</p>
+    <div class="grid-3" style="margin-top: 30px;">
+        <div class="icon-box" style="border: 2px solid var(--secondary);">
+            <i class="fa-solid fa-phone-slash" style="color: var(--secondary);"></i>
+            <h4>បិទ រួចតេទៅវិញ</h4>
+            <p>តេទៅលេខទូរស័ព្ទពិតប្រាកដរបស់ពួកគេ។</p>
+        </div>
+        <div class="icon-box" style="border: 2px solid var(--secondary);">
+            <i class="fa-solid fa-question" style="color: var(--secondary);"></i>
+            <h4>សំណួរសម្ងាត់</h4>
+            <p>សួរអ្វីដែលដឹងតែពីរនាក់ (ឧ. "តើយើងញ៉ាំអីកាលពីល្ងាចមិញ?")</p>
+        </div>
+        <div class="icon-box" style="border: 2px solid var(--secondary);">
+            <i class="fa-solid fa-eye" style="color: var(--secondary);"></i>
+            <h4>សង្កេតចំណុចខុសប្រក្រតី</h4>
+            <p>តើមុខរបស់គេរាងព្រាលៗ? តើសំឡេងដូចរ៉ូបូត?</p>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ៧</div>
+</div>
+
+<!-- Slide 8: Lock the Door -->
+<div class="slide slide-info">
+    <h2>ចាក់សោទ្វារឌីជីថលរបស់អ្នក</h2>
+    <p>អ្នកមិនដែលទុកផ្ទះចោលដោយមិនចាក់សោទេ។ កុំទុកទូរស័ព្ទអ្នកដោយមិនការពារ។</p>
+    <div class="grid-2">
+        <div style="text-align: center;">
+            <i class="fa-solid fa-key" style="font-size: 120px; color: var(--primary); margin-bottom: 20px;"></i>
+        </div>
+        <div>
+            <ul class="step-list">
+                <li><strong>ពាក្យសម្ងាត់ខ្លាំង៖</strong> កុំប្រើ '123456'។ ប្រើពាក្យដែលពិបាកស្មាន។</li>
+                <li><strong>សោរពីរជាន់ (2FA)៖</strong> បើកមុខងារបញ្ជាក់ពីរជំហាន។ ទោះគេដឹង Password ក៏គេចូលមិនបាន។</li>
+            </ul>
+        </div>
+    </div>
+    <div class="alert-box" style="background: #ecfdf5; border-color: var(--secondary);">
+        <p style="margin: 0; color: #065f46;"><strong>វិធានការចម្បង៖</strong> មិនត្រូវចែករំលែកលេខកូដ OTP ទៅឱ្យនរណាម្នាក់ឡើយ សូម្បីតែបុគ្គលិកធនាគារ។</p>
+    </div>
+    <div class="page-num">ទំព័រ ៨</div>
+</div>
+
+<!-- Slide 9: Before Clicking -->
+<div class="slide">
+    <h2>ឈប់សិន មុននឹងចុច (Click)</h2>
+    <p>តំណភ្ជាប់ (Link) ក្លែងក្លាយគឺជាវិធីងាយបំផុតសម្រាប់ចោរចូលមកក្នុងជីវិតអ្នក។</p>
+    <div class="grid-2">
+        <div class="icon-box" style="text-align: left;">
+            <h3 style="color: var(--primary);"><i class="fa-solid fa-circle-info"></i> គន្លឹះសុវត្ថិភាព</h3>
+            <ul style="padding-left: 20px;">
+                <li>កុំចុច Link ពីមនុស្សចម្លែកតាម Telegram ឬ Facebook។</li>
+                <li>ពិនិត្យឈ្មោះគេហទំព័រឱ្យច្បាស់។</li>
+                <li><strong>វិធាន "ល្អពេក"៖</strong> បើការផ្ដល់ជូនមើលទៅល្អពេក (ដូចជាបានលុយហ្វ្រី) វាគឺជាការកុហក។</li>
+            </ul>
+        </div>
+        <div style="text-align: center;">
+            <div style="padding: 20px; border: 2px solid var(--danger); border-radius: 10px; display: inline-block;">
+                <p style="color: var(--danger); font-weight: bold; margin: 0;">ចុចទីនេះដើម្បីដករង្វាន់!</p>
+            </div>
+            <p style="font-size: 14px; margin-top: 10px; color: var(--danger);"><i class="fa-solid fa-arrow-up"></i> នេះគឺជាអន្ទាក់</p>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ៩</div>
+</div>
+
+<!-- Slide 10: Protecting Family -->
+<div class="slide slide-success">
+    <h2>ការពារក្រុមគ្រួសារយើងជាមួយគ្នា</h2>
+    <div class="grid-2">
+        <div class="icon-box" style="background: #f0fdf4;">
+            <i class="fa-solid fa-child-reaching" style="color: var(--secondary);"></i>
+            <h4>សម្រាប់ឪពុកម្តាយ</h4>
+            <ul style="text-align: left; padding-left: 20px; font-size: 16px;">
+                <li>បង្រៀនកូនៗថា មិត្តភក្តិតាមអនឡាញគឺជាមនុស្សចម្លែក។</li>
+                <li>តាមដានអ្វីដែលពួកគេទាញយក (Download)។</li>
+            </ul>
+        </div>
+        <div class="icon-box" style="background: #f0fdf4;">
+            <i class="fa-solid fa-person-cane" style="color: var(--secondary);"></i>
+            <h4>សម្រាប់មនុស្សចាស់</h4>
+            <ul style="text-align: left; padding-left: 20px; font-size: 16px;">
+                <li>ជួយលោកយាយលោកតា រៀបចំសុវត្ថិភាពទូរស័ព្ទ។</li>
+                <li>ប្រាប់គាត់ថា៖ បើមានគេសុំលុយ ឱ្យតេមកយើងមុនគេ។</li>
+            </ul>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ១០</div>
+</div>
+
+<!-- Slide 11: If Tricked -->
+<div class="slide slide-warning">
+    <h2>បើអ្នកត្រូវគេបោក - តើត្រូវធ្វើដូចម្តេច?</h2>
+    <div class="grid-2">
+        <ul class="step-list" style="font-size: 24px;">
+            <li><div class="step-number">១</div> កុំស្លន់ស្លោ (រក្សាភាពស្ងប់ស្ងាត់)</li>
+            <li><div class="step-number">២</div> បិទអ៊ីនធឺណិតភ្លាម</li>
+            <li><div class="step-number">៣</div> តេទៅធនាគារដើម្បីបង្កកគណនី</li>
+            <li><div class="step-number">៤</div> ប្ដូរពាក្យសម្ងាត់ទាំងអស់</li>
+        </ul>
+        <div style="text-align: center;">
+            <i class="fa-solid fa-life-ring" style="font-size: 150px; color: var(--accent); opacity: 0.5;"></i>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ១១</div>
+</div>
+
+<!-- Slide 12: Speak Up -->
+<div class="slide">
+    <h2>រាយការណ៍ដើម្បីបញ្ឈប់ពួកគេ</h2>
+    <p>ប្រសិនបើអ្នកជាជនរងគ្រោះ កុំមានអារម្មណ៍ខ្មាសអៀន។ ការរាយការណ៍ជួយបញ្ឈប់ចោរមិនឱ្យធ្វើបាបអ្នកដទៃ។</p>
+    <div class="grid-3" style="margin-top: 40px;">
+        <div class="icon-box">
+            <i class="fa-solid fa-building-columns"></i>
+            <h4>ធនាគាររបស់អ្នក</h4>
+        </div>
+        <div class="icon-box">
+            <i class="fa-solid fa-handcuffs"></i>
+            <h4>ប៉ូលីស ឬអង្គភាពប្រឆាំងបទល្មើសបច្ចេកវិទ្យា</h4>
+        </div>
+        <div class="icon-box">
+            <i class="fa-solid fa-flag"></i>
+            <h4>រាយការណ៍ក្នុងកម្មវិធី (FB, Telegram, TikTok)</h4>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ១២</div>
+</div>
+
+<!-- Slide 13: Lesson Learned -->
+<div class="slide slide-info">
+    <h2>បង្វែរបទពិសោធន៍អាក្រក់ឱ្យទៅជាមេរៀន</h2>
+    <p>ការបាត់បង់ប្រាក់វាពិតជាឈឺចាប់។ ប៉ុន្តែការរៀនសូត្រពីវាធ្វើឱ្យអ្នកកាន់តែរឹងមាំ។</p>
+    <div class="grid-2" style="margin-top: 30px;">
+        <div style="text-align: center;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 180px; color: var(--primary);"></i>
+        </div>
+        <div>
+            <h3 style="color: var(--primary);">ការស្ដារឡើងវិញ៖</h3>
+            <ul class="bullet-list" style="font-size: 18px; line-height: 2;">
+                <li>ចែករំលែករឿងរបស់អ្នក ដើម្បីកុំឱ្យមិត្តភក្តិចាញ់បោកដូចគ្នា។</li>
+                <li>ធ្វើបច្ចុប្បន្នភាពការកំណត់សុវត្ថិភាព។</li>
+                <li>រាល់ហេតុការណ៍ដែលកើតឡើង គឺជាឱកាសដើម្បីពង្រឹងរបងឌីជីថលរបស់អ្នក។</li>
+            </ul>
+        </div>
+    </div>
+    <div class="page-num">ទំព័រ ១៣</div>
+</div>
+
+<!-- Slide 14: 4 Golden Rules -->
+<div class="slide slide-intro" style="background: var(--primary);">
+    <h2 style="color: white; border: none;">វិធានការមាស ៤ យ៉ាងនៃសុវត្ថិភាពឌីជីថល</h2>
+    <div class="grid-2" style="margin-top: 20px; text-align: left;">
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+            <h3 style="color: white;"><i class="fa-solid fa-hand"></i> ឈប់</h3>
+            <p style="color: white; font-size: 16px;">កុំបណ្ដោយឱ្យនរណាម្នាក់មកបង្ខំអ្នកឱ្យធ្វើអ្វីមួយភ្លាមៗ។</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+            <h3 style="color: white;"><i class="fa-solid fa-eye"></i> មើល</h3>
+            <p style="color: white; font-size: 16px;">តើវាពិតជាមិត្តភក្តិរបស់អ្នកមែនទេ? តើវាជា Deepfake ឬទេ?</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+            <h3 style="color: white;"><i class="fa-solid fa-lightbulb"></i> គិត</h3>
+            <p style="color: white; font-size: 16px;">តើសំណើនេះសមហេតុផលដែរឬទេ?</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+            <h3 style="color: white;"><i class="fa-solid fa-comments"></i> សួរ</h3>
+            <p style="color: white; font-size: 16px;">ពិភាក្សាជាមួយក្រុមគ្រួសារ មុននឹងផ្ញើប្រាក់ទៅនរណាម្នាក់។</p>
+        </div>
+    </div>
+    <div class="page-num" style="color: white;">ទំព័រ ១៤</div>
+</div>
+
+<!-- Slide 15: Conclusion -->
+<div class="slide-intro slide">
+    <h1>ក្លាយជាអ្នកការពារដ៏ឆ្នើម</h1>
+    <p>សហគមន៍ដែលមានសុវត្ថិភាព គឺជាសហគមន៍ដែលមានការយល់ដឹង។</p>
+    <div style="margin: 40px 0;">
+        <i class="fa-solid fa-users-rays" style="font-size: 100px;"></i>
+    </div>
+    <p style="max-width: 700px;">ចែករំលែកការណែនាំនេះជាមួយកូនៗ ឪពុកម្តាយ និងអ្នកជិតខាងរបស់អ្នក។ យើងរួមគ្នាធ្វើឱ្យពិភពឌីជីថលមានសុវត្ថិភាពសម្រាប់មនុស្សគ្រប់គ្នា។</p>
+    <h2 style="color: white; border: none; font-family: 'Freehand', cursive; font-size: 40px; margin-top: 30px;">សូមអរគុណ!</h2>
+    <div class="page-num" style="color: white;">ទំព័រ ១៥</div>
+</div>
+
+</body>
+</html>
