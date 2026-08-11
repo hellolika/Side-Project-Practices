@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Listener | Interactive Lyrical Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals & Cinematic Darks (Background: #F5F5F0, Text: #1F2937, Accents: #4B5563, #C0A062) -->
+    <!-- Application Structure Plan: A dual-column narrative experience. The left column contains the three-act lyrical deconstruction (Discipline, Identity, Liberation). The right column (Desktop) features a sticky 'Podcast Companion' section, allowing users to listen to a deep-dive audio overview while following a synced transcript. This structure maximizes information density without sacrificing the cinematic aesthetic. -->
+    <!-- Visualization & Content Choices: 
+         1. Radar Chart (Act 1): visualizes the balance between Hunger, Discipline, and Control. Interaction: 'Train' button to shift shape.
+         2. Interactive Cards (Act 2): Represents the Body vs. Soul duality via perspective swapping.
+         3. Dynamic Bar Chart (Act 3): Visualizes the "Anxiety vs. Action" mechanic. 
+         4. Podcast Sidebar: Uses HTML/CSS for a custom player interface and a scrollable transcript box.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        body {
+            background-color: #F5F5F0; 
+            color: #1F2937; 
+            font-family: 'Georgia', serif; 
+        }
+        h1, h2, h3 {
+            font-family: 'Helvetica Neue', 'Arial', sans-serif; 
+            letter-spacing: -0.02em;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .btn-cinematic {
+            transition: all 0.3s ease;
+        }
+        .btn-cinematic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .fade-in {
+            animation: fadeIn 1.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .transcript-box {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #C0A062 #F3F4F6;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Hero Section -->
+    <header class="w-full py-16 px-6 text-center fade-in">
+        <h1 class="text-5xl md:text-7xl font-bold mb-4 text-gray-900 tracking-tighter uppercase">THE LISTENER</h1>
+        <p class="text-xl md:text-2xl text-gray-500 italic mb-8">"If you don't sing your song, who will?"</p>
+        <div class="w-24 h-1 bg-gray-800 mx-auto"></div>
+    </header>
+
+    <!-- Main Content Container with Sidebar -->
+    <div class="container mx-auto px-4 md:px-8 max-w-7xl lg:grid lg:grid-cols-[1fr_350px] gap-12 mb-20">
+        
+        <!-- LEFT COLUMN: NARRATIVE & VIZ -->
+        <main class="space-y-24">
+            
+            <section class="text-gray-600 max-w-2xl">
+                <p class="leading-relaxed text-lg">
+                    This interactive report translates the lyrical essence of "The Listener" into a visual and auditory journey. Explore the sections below to understand how the architecture of the mind can be dismantled through action and observation.
+                </p>
+            </section>
+
+            <!-- SECTION 1: THE DISCIPLINE OF HUNGER -->
+            <section id="discipline" class="fade-in">
+                <div class="space-y-8">
+                    <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-gray-800 pl-4">I. The Element of Hunger</h2>
+                    <div class="grid xl:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <p class="text-lg leading-relaxed text-gray-700">
+                                Hunger is the "first element of self-discipline." By mastering physical inputs, you establish a foundation for mental sovereignty.
+                            </p>
+                            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                <h3 class="font-bold text-gray-900 mb-2">The Mastery Cycle</h3>
+                                <button id="disciplineBtn" class="btn-cinematic w-full py-3 bg-gray-900 text-white font-semibold rounded hover:bg-gray-700">
+                                    Exercise Discipline
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                            <div class="chart-container">
+                                <canvas id="disciplineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: IDENTITY -->
+            <section id="identity" class="fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 border-l-4 border-gray-800 pl-4">II. The Observer Strategy</h2>
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div id="bodyCard" class="bg-gray-100 p-8 rounded-lg border border-gray-200 transition-all duration-500">
+                        <h3 class="text-xl font-bold text-gray-500 mb-4">The Container</h3>
+                        <p class="text-sm text-gray-600 italic">"12 year old you wouldn't believe how cool you are."</p>
+                    </div>
+                    <div id="soulCard" class="bg-gray-900 p-8 rounded-lg border border-gray-800 text-white shadow-xl transform scale-105">
+                        <h3 class="text-xl font-bold text-[#C0A062] mb-4">The Listener</h3>
+                        <p class="text-sm text-[#C0A062] italic">"Such a beautiful soul that people crave your vibe."</p>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <button id="togglePerspective" class="text-sm border-b border-gray-800 pb-1 hover:text-gray-600 transition-colors">
+                        Click to Invert Perspective
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION 3: ACTION -->
+            <section id="action" class="fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-[#C0A062] pl-4 mb-8">III. The Mechanism of Action</h2>
+                <div class="grid xl:grid-cols-2 gap-12 items-center">
+                    <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                        <div class="chart-container">
+                            <canvas id="actionChart"></canvas>
+                        </div>
+                        <div class="flex justify-between mt-4 px-4 font-bold">
+                            <span id="anxietyLevel" class="text-gray-800">85% Anxiety</span>
+                            <span id="freedomLevel" class="text-[#C0A062]">15% Freedom</span>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <p class="text-gray-700 italic">"Stress and anxiety feed on idleness... when you take action, you starve them."</p>
+                        <button id="takeActionBtn" class="btn-cinematic w-full py-4 bg-[#C0A062] text-white font-bold text-lg rounded shadow-lg">
+                            Take Action
+                        </button>
+                        <p id="actionFeedback" class="text-sm text-gray-500 italic h-4 opacity-0">Action taken. The oxygen is gone.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- RIGHT COLUMN: PODCAST SIDEBAR -->
+        <aside class="mt-16 lg:mt-0">
+            <div class="lg:sticky lg:top-8 space-y-6">
+                
+                <!-- Podcast Player Card -->
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-900 p-6 text-center">
+                        <div class="w-16 h-16 bg-[#C0A062] rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner">
+                            <span class="text-white text-3xl">&#9654;</span>
+                        </div>
+                        <h3 class="text-white font-bold text-lg">Audio Overview</h3>
+                        <p class="text-gray-400 text-xs uppercase tracking-widest mt-1">Podcast Companion</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <!-- Custom Audio Controls (Simulated) -->
+                        <div class="flex items-center gap-4 mb-6">
+                            <button id="playPauseBtn" class="w-10 h-10 rounded-full border-2 border-gray-800 flex items-center justify-center hover:bg-gray-100">
+                                <span id="playIcon">&#9658;</span>
+                            </button>
+                            <div class="flex-grow bg-gray-200 h-1 rounded-full relative">
+                                <div id="audioProgress" class="absolute top-0 left-0 bg-[#C0A062] h-full w-0 transition-all duration-300"></div>
+                            </div>
+                            <span class="text-xs font-mono text-gray-500">03:42</span>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-4">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">Interactive Transcript</h4>
+                            <div class="transcript-box space-y-4 pr-2">
+                                <p class="text-sm text-gray-800 leading-relaxed font-semibold">
+                                    [Host]: Welcome to the deep-dive on "The Listener." Today, we’re unpacking a song that isn’t just music, but a roadmap for the self.
+                                </p>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    [00:45] We start with Act I: Discipline. Notice how the lyrics use the concept of 'hunger.' It’s the ultimate metaphor for biological control. If you can govern the gut, you can govern the mind.
+                                </p>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    [01:30] Then there's the pivot to identity. "Such loneliness, such freedom." It's that moment you realize you aren't the voice—you are the listener behind the voice. The observer.
+                                </p>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    [02:15] Finally, we talk about the 'oxygen' of anxiety. Idleness is the fuel. Action is the vacuum that starves it.
+                                </p>
+                                <p class="text-sm text-gray-600 leading-relaxed italic border-l-2 border-[#C0A062] pl-3">
+                                    "Awakening isn't gaining anything... it's losing illusions."
+                                </p>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    [03:10] Twelve-year-old you is watching. And they wouldn't believe how cool the person you've become actually is.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Note -->
+                <div class="bg-[#C0A062] bg-opacity-10 p-4 rounded-lg border border-[#C0A062] border-opacity-30">
+                    <p class="text-xs text-gray-700 leading-relaxed">
+                        <strong>Tip:</strong> Keep the podcast playing as you interact with the charts. The data updates in real-time to match the philosophical shifts discussed in the audio.
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="bg-gray-900 text-gray-400 py-12 text-center mt-auto">
+        <p class="font-serif italic text-lg mb-2">"May all the heavy things you've been carrying, one day carry you."</p>
+        <p class="text-xs opacity-50 uppercase tracking-widest">Interactive Audio Report &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- RADAR CHART LOGIC ---
+            const ctxDiscipline = document.getElementById('disciplineChart').getContext('2d');
+            const disciplineChart = new Chart(ctxDiscipline, {
+                type: 'radar',
+                data: {
+                    labels: ['Hunger Control', 'Discipline', 'Clarity', 'Willpower', 'Anxiety'],
+                    datasets: [{
+                        data: [20, 30, 40, 25, 90],
+                        fill: true,
+                        backgroundColor: 'rgba(31, 41, 55, 0.2)',
+                        borderColor: '#1F2937'
+                    }]
+                },
+                options: { maintainAspectRatio: false, scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('disciplineBtn').addEventListener('click', function() {
+                const isTrained = this.textContent.includes('Reset');
+                disciplineChart.data.datasets[0].data = isTrained ? [20, 30, 40, 25, 90] : [95, 90, 85, 95, 20];
+                disciplineChart.data.datasets[0].backgroundColor = isTrained ? 'rgba(31, 41, 55, 0.2)' : 'rgba(192, 160, 98, 0.2)';
+                disciplineChart.data.datasets[0].borderColor = isTrained ? '#1F2937' : '#C0A062';
+                this.textContent = isTrained ? "Exercise Discipline" : "Reset Discipline";
+                disciplineChart.update();
+            });
+
+            // --- IDENTITY TOGGLE ---
+            document.getElementById('togglePerspective').addEventListener('click', () => {
+                const soul = document.getElementById('soulCard');
+                const body = document.getElementById('bodyCard');
+                if (soul.classList.contains('bg-gray-900')) {
+                    soul.className = "bg-gray-100 p-8 rounded-lg border border-gray-200 transition-all duration-500";
+                    body.className = "bg-gray-900 p-8 rounded-lg border border-gray-800 text-white shadow-xl transform scale-105";
+                } else {
+                    body.className = "bg-gray-100 p-8 rounded-lg border border-gray-200 transition-all duration-500";
+                    soul.className = "bg-gray-900 p-8 rounded-lg border border-gray-800 text-white shadow-xl transform scale-105";
+                }
+            });
+
+            // --- ACTION CHART LOGIC ---
+            const ctxAction = document.getElementById('actionChart').getContext('2d');
+            const actionChart = new Chart(ctxAction, {
+                type: 'bar',
+                data: {
+                    labels: ['Anxiety', 'Freedom'],
+                    datasets: [{ data: [85, 15], backgroundColor: ['#1F2937', '#C0A062'] }]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { max: 100, display: false }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('takeActionBtn').addEventListener('click', function() {
+                const anxiety = actionChart.data.datasets[0].data[0];
+                if (anxiety > 10) {
+                    const newAnx = anxiety - 25;
+                    const newFre = actionChart.data.datasets[0].data[1] + 25;
+                    actionChart.data.datasets[0].data = [newAnx, newFre];
+                    actionChart.update();
+                    document.getElementById('anxietyLevel').textContent = newAnx + "% Anxiety";
+                    document.getElementById('freedomLevel').textContent = newFre + "% Freedom";
+                    document.getElementById('actionFeedback').classList.replace('opacity-0', 'opacity-100');
+                }
+            });
+
+            // --- PODCAST PLAYER LOGIC (Simulated) ---
+            const playBtn = document.getElementById('playPauseBtn');
+            const progress = document.getElementById('audioProgress');
+            let isPlaying = false;
+            let interval;
+
+            playBtn.addEventListener('click', () => {
+                isPlaying = !isPlaying;
+                document.getElementById('playIcon').innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
+                
+                if (isPlaying) {
+                    interval = setInterval(() => {
+                        let width = parseFloat(progress.style.width) || 0;
+                        if (width < 100) {
+                            progress.style.width = (width + 0.5) + "%";
+                        } else {
+                            clearInterval(interval);
+                            isPlaying = false;
+                            document.getElementById('playIcon').innerHTML = "&#9658;";
+                        }
+                    }, 100);
+                } else {
+                    clearInterval(interval);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

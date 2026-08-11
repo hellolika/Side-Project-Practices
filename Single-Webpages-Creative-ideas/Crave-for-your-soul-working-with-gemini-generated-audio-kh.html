@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Listener | Interactive Lyrical Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals & Cinematic Darks (Background: #F5F5F0, Text: #1F2937, Accents: #4B5563, #C0A062) -->
+    <!-- Application Structure Plan: A dual-column narrative experience. The left column contains the three-act lyrical deconstruction. The right column features a functional 'Podcast Companion' powered by Gemini TTS with a new Download feature. -->
+    <!-- Visualization & Content Choices: 
+         1. Radar Chart (Act 1): visualizes the balance between Hunger and Discipline.
+         2. Interactive Cards (Act 2): Body vs. Soul duality toggle.
+         3. Dynamic Bar Chart (Act 3): Anxiety vs. Action mechanic. 
+         4. Podcast Sidebar: INTEGRATED TTS. Uses gemini-2.5-flash-preview-tts to narrate the transcript.
+         5. Download Feature: Utilizes a temporary anchor element to trigger a local file save of the generated WAV Blob.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        body { background-color: #F5F5F0; color: #1F2937; font-family: 'Georgia', serif; }
+        h1, h2, h3 { font-family: 'Helvetica Neue', 'Arial', sans-serif; letter-spacing: -0.02em; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        .btn-cinematic { transition: all 0.3s ease; }
+        .btn-cinematic:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .fade-in { animation: fadeIn 1.5s ease-in; } 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .transcript-box { max-height: 350px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #C0A062 #F3F4F6; }
+        .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #C0A062; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="w-full py-16 px-6 text-center fade-in">
+        <h1 class="text-5xl md:text-7xl font-bold mb-4 text-gray-900 tracking-tighter uppercase">THE LISTENER</h1>
+        <p class="text-xl md:text-2xl text-gray-500 italic mb-8">"If you don't sing your song, who will?"</p>
+        <div class="w-24 h-1 bg-gray-800 mx-auto"></div>
+    </header>
+
+    <div class="container mx-auto px-4 md:px-8 max-w-7xl lg:grid lg:grid-cols-[1fr_380px] gap-12 mb-20">
+        
+        <main class="space-y-24">
+            <section class="text-gray-600 max-w-2xl">
+                <p class="leading-relaxed text-lg">
+                    This interactive report translates the lyrical essence of "The Listener" into a visual and auditory journey.
+                </p>
+            </section>
+
+            <!-- SECTION 1 -->
+            <section id="discipline" class="fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-gray-800 pl-4 mb-8">I. The Element of Hunger</h2>
+                <div class="grid xl:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4">
+                        <p class="text-lg text-gray-700">Hunger is the "first element of self-discipline."</p>
+                        <button id="disciplineBtn" class="btn-cinematic w-full py-3 bg-gray-900 text-white font-semibold rounded">Exercise Discipline</button>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-lg"><div class="chart-container"><canvas id="disciplineChart"></canvas></div></div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section id="identity" class="fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 border-l-4 border-gray-800 pl-4">II. The Observer Strategy</h2>
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div id="bodyCard" class="bg-gray-100 p-8 rounded-lg border border-gray-200 transition-all duration-500">
+                        <h3 class="text-xl font-bold text-gray-500 mb-4">The Container</h3>
+                    </div>
+                    <div id="soulCard" class="bg-gray-900 p-8 rounded-lg border border-gray-800 text-white shadow-xl transform scale-105">
+                        <h3 class="text-xl font-bold text-[#C0A062] mb-4">The Listener</h3>
+                    </div>
+                </div>
+                <div class="mt-8 text-center"><button id="togglePerspective" class="text-sm border-b border-gray-800 pb-1">Invert Perspective</button></div>
+            </section>
+
+            <!-- SECTION 3 -->
+            <section id="action" class="fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-[#C0A062] pl-4 mb-8">III. The Mechanism of Action</h2>
+                <div class="grid xl:grid-cols-2 gap-12 items-center">
+                    <div class="bg-white p-4 rounded-xl shadow-lg"><div class="chart-container"><canvas id="actionChart"></canvas></div></div>
+                    <div class="space-y-6">
+                        <button id="takeActionBtn" class="btn-cinematic w-full py-4 bg-[#C0A062] text-white font-bold text-lg rounded shadow-lg">Take Action</button>
+                        <p id="anxietyLevel" class="text-center font-bold">85% Anxiety | 15% Freedom</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- PODCAST SIDEBAR -->
+        <aside class="mt-16 lg:mt-0">
+            <div class="lg:sticky lg:top-8 space-y-6">
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-900 p-6 text-center">
+                        <div id="podcastPulse" class="w-16 h-16 bg-[#C0A062] rounded-full mx-auto flex items-center justify-center mb-4 transition-transform duration-500">
+                            <span id="playerStatusIcon" class="text-white text-3xl">&#9654;</span>
+                        </div>
+                        <h3 class="text-white font-bold text-lg">Deep Dive: The Listener</h3>
+                        <p id="loadingText" class="text-[#C0A062] text-xs mt-2 hidden"><span class="loading-spinner mr-2"></span>Generating Audio...</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between gap-4 mb-6">
+                            <div class="flex items-center gap-4 flex-grow">
+                                <button id="playPauseBtn" class="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center hover:bg-100 transition-colors">
+                                    <span id="playIcon" class="text-xl">&#9658;</span>
+                                </button>
+                                <div class="flex-grow bg-gray-200 h-1 rounded-full relative">
+                                    <div id="audioProgress" class="absolute top-0 left-0 bg-[#C0A062] h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <!-- Download Button (Initially Disabled/Hidden-ish) -->
+                            <button id="downloadBtn" class="p-2 text-gray-400 hover:text-gray-900 transition-colors disabled:opacity-30 disabled:cursor-not-allowed" title="Download Audio" disabled>
+                                <span class="text-xl">&#128229;</span>
+                            </button>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-4">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">Transcript</h4>
+                            <div id="transcript" class="transcript-box space-y-4 pr-2 text-sm text-gray-600 leading-relaxed">
+    <p class="font-semibold text-gray-900">ព្រឹកឡើងខ្ញុំមិនបាននិយាយពីរឿងនេះទេ ព្រោះមិនចង់បន្តភាពភ័យខ្លាច ប៉ុន្តែមិត្តភក្តិខ្ញុំប្រាប់ថា យប់មិញជាថ្ងៃសែនដូនតាជនជាតិចិន ដែលគេជឿថាជាពេលបញ្ចេញពពួកអរូបីឱ្យមកដើរលេង។</p>
+    
+    <p>វាដូចជាបុណ្យភ្ជុំបិណ្ឌរបស់ខ្មែរយើងដែរ ហើយវេលាម៉ោងដែលខ្ញុំដើរនោះគឺម៉ោង ៣-៤ ភ្លឺ ដែលជាម៉ោងពពួកនោះដើរ។ បន្ទាប់ពីថ្ងៃនោះមក ខ្ញុំក៏ចាប់ផ្តើមគ្រុនក្តៅខ្លាំង លេបថ្នាំក៏មិនបាត់ មានតែឈឺលើសដើម។ ដំបូងឡើយ ខ្ញុំគិតថាមកពីធ្វើការខ្លាំងពេក ក៏ព្យាយាមហូបអាហារបំប៉ន និងសម្រាកឱ្យបានច្រើន ប៉ុន្តែអាការៈនៅតែមិនធូរស្រាលសោះ។</p>
+    
+    <p>បន្ទាប់ពីឈឺអស់រយៈពេល ២ថ្ងៃ ខ្ញុំក៏នឹកឃើញដល់រឿងដែលបានជួប និងអារម្មណ៍ដែលថាមានគេចង់បានសក់របស់ខ្ញុំ។ ក្នុងពេលដែលកំពុងវិលមុខ និងងងឹតមុខស្លុបៗនោះ ខ្ញុំក៏សម្រេចចិត្តយកកន្ត្រៃមកកាត់សក់ពាក់កណ្តាលចេញចោល និងនិយាយបញ្ចោរតាមជំនឿខ្មែរ ដើម្បីឱ្យឧបទ្រពចង្រៃទាំងឡាយទៅតាមសក់នោះអស់ទៅ។</p>
+    
+    <p>វាជារឿងដែលមិនគួរឱ្យជឿ ព្រោះមិនដល់ ១០នាទីផង អាការៈរបស់ខ្ញុំក៏ចាប់ផ្តើមធូរស្រាល និងស្រឡះខ្លួនតែម្តង។ ទោះជាយ៉ាងណាក៏ដោយ ក៏ខ្ញុំនៅតែមិនអាចឈប់ធ្វើការដាច់យប់បានដែរ ព្រោះការងារឆ្នាំបញ្ចប់វាច្រើនពេក (ហាហា) គ្រាន់តែមិនហ៊ាននៅដល់ម៉ោង ៣-៤ ភ្លឺដូចមុនទៀតប៉ុណ្ណោះ។</p>
+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="bg-gray-900 text-gray-400 py-12 text-center mt-auto">
+        <p class="font-serif italic text-lg mb-2">"You are a soul with a body, not a body with a soul."</p>
+    </footer>
+
+    <script>
+        const apiKey = ""; // Provided by execution environment
+        const modelName = "gemini-2.5-flash-preview-tts";
+        
+        // --- PCM to WAV Utility ---
+        function pcm16ToWav(pcmData, sampleRate = 24000) {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            const writeString = (offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            writeString(0, 'RIFF');
+            view.setUint32(4, 32 + pcmData.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+            for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function fetchAudio(text) {
+            let retries = 0;
+            const delay = ms => new Promise(res => setTimeout(res, ms));
+            while (retries < 5) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: `Say in a calm, philosophical cinematic voice: ${text}` }] }],
+                            generationConfig: {
+                                responseModalities: ["AUDIO"],
+                                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Despina" } } }
+                            }
+                        })
+                    });
+                    const result = await response.json();
+                    const audioData = result.candidates[0].content.parts[0].inlineData.data;
+                    const binaryString = atob(audioData);
+                    const len = binaryString.length;
+                    const bytes = new Int16Array(len / 2);
+                    for (let i = 0; i < len; i += 2) {
+                        bytes[i / 2] = (binaryString.charCodeAt(i + 1) << 8) | binaryString.charCodeAt(i);
+                    }
+                    return pcm16ToWav(bytes, 24000);
+                } catch (e) {
+                    retries++;
+                    await delay(Math.pow(2, retries) * 1000);
+                }
+            }
+            throw new Error("Failed to generate audio.");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Audio Logic
+            const playBtn = document.getElementById('playPauseBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const transcriptText = Array.from(document.querySelectorAll('#transcript p')).map(p => p.innerText).join(' ');
+            let audioPlayer = new Audio();
+            let isGenerating = false;
+            let currentAudioBlob = null;
+
+            playBtn.addEventListener('click', async () => {
+                if (isGenerating) return;
+                
+                if (audioPlayer.src) {
+                    if (audioPlayer.paused) audioPlayer.play();
+                    else audioPlayer.pause();
+                    return;
+                }
+
+                try {
+                    isGenerating = true;
+                    document.getElementById('loadingText').classList.remove('hidden');
+                    document.getElementById('playIcon').innerHTML = "...";
+                    
+                    const blob = await fetchAudio(transcriptText);
+                    currentAudioBlob = blob;
+                    audioPlayer.src = URL.createObjectURL(blob);
+                    
+                    // Enable download button once we have a blob
+                    downloadBtn.disabled = false;
+                    downloadBtn.classList.remove('text-gray-400');
+                    downloadBtn.classList.add('text-gray-900');
+                    
+                    document.getElementById('loadingText').classList.add('hidden');
+                    audioPlayer.play();
+                } catch (err) {
+                    alert("Sound generation failed. Please try again.");
+                } finally {
+                    isGenerating = false;
+                }
+            });
+
+            // Download Handler
+            downloadBtn.addEventListener('click', () => {
+                if (!currentAudioBlob) return;
+                
+                const url = URL.createObjectURL(currentAudioBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'the_listener_podcast.wav';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+            });
+
+            audioPlayer.onplay = () => {
+                document.getElementById('playIcon').innerHTML = "&#10074;&#10074;";
+                document.getElementById('podcastPulse').classList.add('animate-pulse');
+            };
+            audioPlayer.onpause = () => {
+                document.getElementById('playIcon').innerHTML = "&#9658;";
+                document.getElementById('podcastPulse').classList.remove('animate-pulse');
+            };
+            audioPlayer.ontimeupdate = () => {
+                const prog = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                document.getElementById('audioProgress').style.width = prog + "%";
+            };
+
+            // Radar Chart Logic
+            const ctxD = document.getElementById('disciplineChart').getContext('2d');
+            const dChart = new Chart(ctxD, {
+                type: 'radar',
+                data: { labels: ['Hunger', 'Discipline', 'Clarity', 'Willpower', 'Anxiety'], datasets: [{ data: [20, 30, 40, 25, 90], backgroundColor: 'rgba(31,41,55,0.2)', borderColor: '#1F2937' }] },
+                options: { maintainAspectRatio: false, scales: { r: { suggestedMax: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('disciplineBtn').onclick = () => {
+                const trained = dChart.data.datasets[0].data[0] > 50;
+                dChart.data.datasets[0].data = trained ? [20, 30, 40, 25, 90] : [95, 90, 85, 95, 20];
+                dChart.update();
+            };
+
+            // Action Chart Logic
+            const ctxA = document.getElementById('actionChart').getContext('2d');
+            const aChart = new Chart(ctxA, {
+                type: 'bar',
+                data: { labels: ['Anxiety', 'Freedom'], datasets: [{ data: [85, 15], backgroundColor: ['#1F2937', '#C0A062'] }] },
+                options: { maintainAspectRatio: false, scales: { y: { max: 100, display: false } }, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('takeActionBtn').onclick = () => {
+                aChart.data.datasets[0].data = [Math.max(5, aChart.data.datasets[0].data[0] - 20), Math.min(95, aChart.data.datasets[0].data[1] + 20)];
+                aChart.update();
+                document.getElementById('anxietyLevel').innerText = `${aChart.data.datasets[0].data[0]}% Anxiety | ${aChart.data.datasets[0].data[1]}% Freedom`;
+            };
+
+            document.getElementById('togglePerspective').onclick = () => {
+                const s = document.getElementById('soulCard');
+                const b = document.getElementById('bodyCard');
+                [s.className, b.className] = [b.className, s.className];
+            };
+        });
+    </script>
+</body>
+</html>
