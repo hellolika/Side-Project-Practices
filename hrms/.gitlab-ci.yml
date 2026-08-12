@@ -1,0 +1,159 @@
+stages:
+  - BuildDbStaging
+  - DeployStaging
+  - Staging
+  - BuildDbUat
+  - DeployDbUat
+  - Uat
+  - BuildDbProduction
+  - DeployDbProduction
+  - Production
+
+########################################
+#            DEPLOY TEMPLATE           #
+########################################
+.deploy-template: &deploy-template
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+    - 'nuget restore ${env:CI_PROJECT_DIR}\HRMS\HRMS.sln -MSBuildPath C:\"Program Files (x86)"\"Microsoft Visual Studio"\2022\BuildTools\MSBuild\Current\Bin'
+    - 'dotnet publish /p:EnvironmentName=${EnvVariable} ${env:CI_PROJECT_DIR}\HRMS\HRMS.csproj'
+    - "write-host /p:EnvironmentName=${EnvVariable}"
+  script:
+    - "Import-Module IISAdministration"
+    - 'write-host "Stop Site : Project : HRMS"'
+    - 'C:\PSTools\PsExec "\\${ServerName}" /accepteula C:\Windows\System32\inetsrv\appcmd.exe Stop Site ${SiteName}'
+    - 'C:\PSTools\PsExec "\\${ServerName}" /accepteula C:\Windows\System32\inetsrv\appcmd.exe Stop AppPools ${SiteName}'
+    - 'write-host "Site Successfully Stop"'
+    - 'Robocopy ${env:CI_PROJECT_DIR}\HRMS\bin\Debug\net6.0\publish F:\CSMC\${ProjectName} /e; if ($lastexitcode -eq 0){write-host "Robocopy succeeded"} else {write-host "Robocopy Failed"}'
+    - 'Robocopy F:\CSMC\${ProjectName} ${deployFolder}; if ($lastexitcode -eq 0){write-host "Robocopy succeeded"} else {write-host "Robocopy Failed"}'
+    - if (${EnvVariable} -eq 'Production') { ((Get-Content -path ${env:CI_PROJECT_DIR}\web.config -Raw) -replace 'Staging','Production') | Set-Content -Path ${deployFolder}\web.config }
+    - 'write-host "Start Site : Project : HRMS"'
+    - 'C:\PSTools\PsExec "\\${ServerName}" /accepteula C:\Windows\System32\inetsrv\appcmd.exe Start AppPools ${SiteName}'
+    - 'C:\PSTools\PsExec "\\${ServerName}" /accepteula C:\Windows\System32\inetsrv\appcmd.exe Start Site ${SiteName}'
+    - 'write-host "Site Successfully Start"'
+    - $content = 'Release Time (GMT-4):'+ (Get-Date).ToString("yyyy/MM/dd HH:mm:ss") +"`nVersion :"+$CI_COMMIT_SHA
+    - $content | Set-Content -Path F:\CSMC\HRMS\version.txt
+
+########################################
+#              DEPLOYMENT              #
+########################################
+
+stg-build:
+  stage: BuildDbStaging
+  tags:
+    - HRMS-STG
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\OnlyBuild.ps1 -hash $($CI_COMMIT_SHA) -folder ${env:CI_PROJECT_DIR}\HRMSDB\HRMSDB.sqlproj'
+  only:
+    - develop
+
+stg-publish:
+  stage: DeployStaging
+  tags:
+    - HRMS-STG
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\PublishDB.ps1  -env "STG" -hash $($CI_COMMIT_SHA)'
+  dependencies:
+    - stg-build
+  only:
+    - develop
+
+stg_deploy:
+  <<: *deploy-template
+  stage: Staging
+  tags:
+    - HRMS-STG
+  variables:
+    ProjectName: "HRMS"
+    SiteName: "HRMS"
+    EnvVariable: "Staging"
+    RunnerLocation: "C"
+    deployFolder: "\\\\kh-z10.aw02.pbodia.com\\CSMC\\HRMS"
+    ServerName: "kh-z10.aw02.pbodia.com"
+  only:
+    - develop
+
+uat-build:
+  stage: BuildDbUat
+  tags:
+    - HRMS-UAT
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\OnlyBuild.ps1 -hash $($CI_COMMIT_SHA) -folder ${env:CI_PROJECT_DIR}\HRMSDB\HRMSDB.sqlproj'
+  only:
+    - master
+
+uat-publish:
+  stage: DeployDbUat
+  tags:
+    - HRMS-UAT
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\PublishDB.ps1  -env "UAT" -hash $($CI_COMMIT_SHA)'
+  dependencies:
+    - uat-build
+  only:
+    - master
+
+uat_deploy:
+  <<: *deploy-template
+  stage: Uat
+  tags:
+    - HRMS-UAT
+  variables:
+    ProjectName: "HRMS"
+    SiteName: "HRMS"
+    EnvVariable: "Demo"
+    RunnerLocation: "D"
+    deployFolder: "\\\\kh-x10.aw02.pbodia.com\\CSMC\\HRMS"
+    ServerName: "kh-x10.aw02.pbodia.com"
+  only:
+    - master
+
+production-build:
+  stage: BuildDbProduction
+  tags:
+    - HRMS-PROD
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\OnlyBuild.ps1 -hash $($CI_COMMIT_SHA) -folder ${env:CI_PROJECT_DIR}\HRMSDB\HRMSDB.sqlproj'
+  when: manual
+  only:
+    - production
+
+production-publish:
+  stage: DeployDbProduction
+  tags:
+    - HRMS-PROD
+  before_script:
+    - '$env:Path = "$($env:Path);C:\Nuget"'
+  script:
+    - 'powershell ${env:CI_PROJECT_DIR}\Scripts\PublishDB.ps1 -env "PROD" -hash $($CI_COMMIT_SHA) -dbName "HRMSDB_Production"'
+  when: manual
+  dependencies:
+    - production-build
+  only:
+    - production
+
+production_deploy:
+  <<: *deploy-template
+  stage: Production
+  tags:
+    - HRMS-PROD
+  variables:
+    ProjectName: "HRMS"
+    SiteName: "HRMS"
+    EnvVariable: "Production"
+    RunnerLocation: "F"
+    deployFolder: "F:\\CSMC\\HRMS"
+    ServerName: "hrms.techbodia.local"
+  when: manual
+  only:
+    - production

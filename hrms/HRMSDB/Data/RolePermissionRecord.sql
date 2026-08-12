@@ -1,0 +1,34 @@
+-- TRUNCATE TABLE [dbo].[RolePermissionRecord]
+-- GO
+-- BEGIN
+-- 	INSERT INTO [dbo].[RolePermissionRecord] (
+-- 	[RoleId],
+-- 	[PermissionId],
+-- 	[CreatedOn],
+-- 	[ModifiedOn]
+-- ) VALUES
+-- (1, 1, GETDATE(), GETDATE()),
+-- (1, 2, GETDATE(), GETDATE()),
+-- (1, 3, GETDATE(), GETDATE()),
+-- (1, 4, GETDATE(), GETDATE()),
+-- (1, 5, GETDATE(), GETDATE()),
+-- (1, 6, GETDATE(), GETDATE()),
+-- (1, 7, GETDATE(), GETDATE()),
+-- (1, 8, GETDATE(), GETDATE()),
+-- (1, 9, GETDATE(), GETDATE()),
+-- (1, 10, GETDATE(), GETDATE()),
+-- (1, 11, GETDATE(), GETDATE()),
+-- (1, 12, GETDATE(), GETDATE()),
+-- (1, 13, GETDATE(), GETDATE()),
+-- (1, 14, GETDATE(), GETDATE()),
+-- (1, 15, GETDATE(), GETDATE()),
+-- (1, 16, GETDATE(), GETDATE()),
+-- (1, 17, GETDATE(), GETDATE()),
+-- (1, 18, GETDATE(), GETDATE()),
+-- (1, 19, GETDATE(), GETDATE()),
+-- (1, 20, GETDATE(), GETDATE()),
+-- (1, 21, GETDATE(), GETDATE()),
+-- (1, 22, GETDATE(), GETDATE()),
+-- (1, 23, GETDATE(), GETDATE()),
+-- (1, 24, GETDATE(), GETDATE())
+-- END
