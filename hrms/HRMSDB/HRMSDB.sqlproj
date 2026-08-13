@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>HRMSDB</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{1181fbf7-7067-4547-9690-d0b600492e47}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>HRMSDB</RootNamespace>
+    <AssemblyName>HRMSDB</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <SqlTargetName>HRMSDB</SqlTargetName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Dbo" />
+    <Folder Include="Dbo\Store Procedures" />
+    <Folder Include="Dbo\Tables" />
+    <Folder Include="Dbo\User Defined Types" />
+    <Folder Include="Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Dbo\Store Procedures\HRMS_Login.sql" />
+    <Build Include="Dbo\Tables\Member.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_IsMemberExist.sql" />
+    <Build Include="Dbo\Tables\Attendances.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DoClock.sql" />
+    <Build Include="Dbo\Tables\ReClockRecord.sql" />
+    <Build Include="Dbo\Tables\TakeLeaveRecord.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DoReclock.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_TakeLeave.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetProfile.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_CancelLeave.sql" />
+    <Build Include="Dbo\Tables\LeaveType.sql" />
+    <Build Include="Dbo\Tables\LeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMemberLeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetLeaveRecordsByMemberId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllLeaveType.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_CheckClockStatus.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllReClockRecords.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllMembers.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllLeaves.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllReClock.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_LeaveRequestApproval.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllAbsentee.sql" />
+    <Build Include="Dbo\Tables\LocationDetail.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddLocation.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetLocation.sql" />
+    <Build Include="Dbo\Tables\Team.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetTeamInfo.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_ChangePassword.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_ReClockRequestApproval.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetSingleMemberAttendancesByDateRange.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetSingleMemberReclockRecordsByDateRange.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetSingleMemberTakeLeaveRecordsByDateRange.sql" />
+    <None Include="Data\LeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_RegisterMember.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_EditMember.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_ResetMemberPassword.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllLeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateLeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_PopulateDefaultLeavesForCurrentYear.sql" />
+    <Build Include="Dbo\Tables\Announcement.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAnnouncements.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddAnnouncement.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_EditAnnouncement.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteAnnouncement.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetTotalAnnouncements.sql" />
+    <None Include="Data\Member.Production.sql" />
+    <Build Include="Dbo\Tables\Transfer.sql" />
+    <Build Include="Dbo\Tables\TransferType.sql" />
+    <Build Include="Dbo\User Defined Types\WorkingDay.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_TransferTypes.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddTransferType.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GenerateMemberMonthlyTransfer.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddMonthlyTransfer.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteMonthlyTransfer.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMonthlyTransfers.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMemberTransfers.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddOrEditLeaveRecord.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateProfile.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateTakeLeave.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteMember.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddUnpaidLeave.sql" />
+    <Build Include="Dbo\Tables\MemberRoleRecord.sql" />
+    <Build Include="Dbo\Tables\PermissionCategory.sql" />
+    <Build Include="Dbo\Tables\RolePermissionRecord.sql" />
+    <Build Include="Dbo\Tables\RoleType.sql" />
+    <Build Include="Data\RolePermissionRecord.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_PopulateMemberRoleRecord.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddMemberRole.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllRole.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteMemberRole.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllPermission.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddRole.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetDashboard.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_EditMemberLeaves.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllAttendance.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetPermissionByRoleId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateRolePermission.sql" />
+    <Build Include="Dbo\Tables\PermissionType.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateMemberRole.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMemberByRoleId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateRoleByMemberId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetRoleByMemberId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMemberPermission.sql" />
+    <Build Include="Dbo\Tables\BeneficiaryType.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetBeneficiaryType.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetMemberLeaveAmountV2.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAttendanceById.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetLeaveRequestsByMemberId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllReclockRecordsById.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_RegisterLeaveAmount.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddLeaveAmountToAllMember.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateMemberMonthlyTransferStatus.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_BatchUpdateMonthlyTransferStatus.sql" />
+    <Build Include="Dbo\Tables\Position.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllPositionByTeamId.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddPosition.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdatePosition.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeletePosition.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetResignTransfer.sql" />
+    <Build Include="Dbo\Tables\Department.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllDepartment.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddDepartment.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateDepartment.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteDepartment.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_AddTeam.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateTeam.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteTeam.sql" />
+    <Build Include="Dbo\Tables\JobGrade.sql" />
+    <!-- <Build Include="Dbo\Store Procedures\HRMS_GetAllJobGrade.sql" /> -->
+    <Build Include="Dbo\Store Procedures\HRMS_AddJobGrade.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateJobGrade.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteJobGrade.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpdateLocation.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_DeleteLocation.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetDepartmentManager.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllPosition.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_GetAllJobGrade.sql" />
+    <Build Include="Dbo\Tables\SlackUserInfo.sql" />
+    <Build Include="Dbo\Store Procedures\HRMS_UpsertSlackUsers.sql" />
+    <Build Include="Dbo\User Defined Types\SlackUserDataType.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="local.publish.xml" />
+    <None Include="staging.publish.xml" />
+    <None Include="Data\TransferType.sql" />
+    <None Include="staging.schemaOnly.publish.xml" />
+    <None Include="Data\Member.sql" />
+    <None Include="Data\Team.sql" />
+    <None Include="Data\LeaveType.sql" />
+    <None Include="Data\LocationDetail.sql" />
+    <None Include="Data\RoleType.sql" />
+    <None Include="Data\PermissionCategory.sql" />
+    <None Include="Data\PermissionType.sql" />
+    <None Include="Data\PopulateSuperAdminPermission.sql" />
+    <None Include="Data\BeneficiaryType.sql" />
+    <None Include="Data\Position.sql" />
+    <None Include="Data\Department.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="HRMSDB.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="Mode">
+      <DefaultValue>SchemaOnly</DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(NetCoreBuild)' == 'true'" Project="$(NETCoreTargetsPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <PackageReference Condition="'$(NetCoreBuild)' == 'true'" Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+  <!-- <ItemGroup>
+    <PreDeploy Include="Data\PermissionCategory.sql" />
+  </ItemGroup> -->
+</Project>

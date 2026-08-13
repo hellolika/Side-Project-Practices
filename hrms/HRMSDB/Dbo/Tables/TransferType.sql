@@ -1,0 +1,20 @@
+CREATE TABLE [dbo].[TransferType]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[TransferName] NVARCHAR(100)  NOT NULL,
+	[BeneficiaryTypeId] INT NOT NULL DEFAULT 0,
+	[IsEnable] BIT NOT NULL DEFAULT 1,
+	[CreatedBy] INT NULL,
+    [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(),
+    [ModifiedBy] INT NULL, 
+    [ModifiedOn] DATETIME NOT NULL DEFAULT GETDATE(),
+	CONSTRAINT UQ_TransferType UNIQUE(TransferName)   
+)
+
+
+--   TRUNCATE TABLE [HRMSDB].[dbo].[TransferType];
+
+-- ALTER TABLE [HRMSDB].[dbo].[TransferType] ADD UNIQUE NONCLUSTERED
+-- ([TransferName] ASC)
+-- WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF)
+-- ON [PRIMARY]

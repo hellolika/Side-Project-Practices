@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[Announcement]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [Title] NVARCHAR(200) NOT NULL,
+    [Message] NVARCHAR(2000) NOT NULL,
+    [CreatedBy] INT NOT NULL, 
+    [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(),
+    [ModifiedBy] INT NOT NULL, 
+    [ModifiedOn] DATETIME NOT NULL DEFAULT GETDATE(),
+)

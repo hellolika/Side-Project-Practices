@@ -1,0 +1,39 @@
+TRUNCATE TABLE [dbo].[Position]
+GO
+
+BEGIN
+	INSERT INTO [dbo].[Position] (
+	[TeamId],
+	[PositionName]
+	) VALUES
+(1, 'GM'),
+(1, 'TEAM LEAD'),
+(1, 'SR. TECHNICAL AND PRODUCT MANAGER'),
+(1, 'JR. TECHNICAL AND PRODUCT MANAGER'),
+(2, 'SR. FLUTTER DEVELOPER'),
+(2, 'JR. FLUTTER DEVELOPER'),
+(2, 'TEAM LEAD'),
+(2, 'AST. TEAM LEAD'),
+(3, 'SR. QA'),
+(3, 'JR. QA'),
+(3, 'TEAM LEAD'),
+(3, 'AST. TEAM LEAD'),
+(4, 'SR. WEB DEVELOPER'),
+(4, 'JR. WEB DEVELOPER'),
+(4, 'TEAM LEAD'),
+(4, 'AST. TEAM LEAD'),
+(5, 'SR. C# DEVELOPER'),
+(5, 'JR. C# DEVELOPER'),
+(5, 'TEAM LEAD'),
+(5, 'AST. TEAM LEAD'),
+(6, 'SR. IT ENGINEER'),
+(6, 'JR. IT ENGINEER'),
+(6, 'SR. UI/UX DESIGNER'),
+(6, 'JR. UI/UX DESIGNER'),
+(6, 'HR & ADMIN MANAGER'),
+(6, 'SR. HR & ADMIN EXECUTIVE'),
+(6, 'JR. HR & ADMIN EXECUTIVE'),
+(6,'CLEANER'),
+(6,'DRIVER')
+
+END
