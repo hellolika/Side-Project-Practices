@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambodian Face Dataset Sourcing & Engineering Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar and minimal helper styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Chosen Palette: Slate & Amber Trust Palette (Slate-50 background, Slate-900 headers, Amber/Indigo accents for engineering clarity) -->
+
+    <!-- Application Structure Plan:
+        1. Executive Metric Header: High-level KPI indicators (Target vs Available, Total Channels, Recommended Protocol B stats).
+        2. Navigation Bar: Tabbed switching between 6 core modules (Interactive Link Repository, Dataset Simulator, Channel Directory, Keyword Scraper Builder, CV & Legal Protocols, User Manual / README).
+        3. Module 1: Seed Links Repository (Searchable, filterable table of all 73 curated video URLs with one-click copy and filter by category/channel).
+        4. Module 2: Sampling & Storage Math Simulator (Interactive sliders for target image count, frame extraction stride, calculating required videos, disk space, and data leakage risks alongside comparative Chart.js charts).
+        5. Module 3: Official Channel & Playlist Catalog (Structured cards detailing channel handles, video archives, duration fit, and master playlist IDs).
+        6. Module 4: Khmer Keyword & yt-dlp Command Generator (Dynamic tool producing copy-ready bash scripts for automated YouTube extraction).
+        7. Module 5: Engineering & Legal Compliance Guide (Step-by-step RetinaFace bounding-box standard, Sub-Decree 252 & MPTC 2026 guidelines).
+        8. Module 6: Integrated User Manual / README (Full technical documentation embedded directly into the application for seamless reference).
+    -->
+
+    <!-- Visualization & Content Choices:
+        - Protocol Benchmark Comparison: Chart.js Bar Chart comparing Videos Required vs Frame Redundancy across Protocols A, B, C, D (No SVG used).
+        - Storage & Bandwidth Estimate: Chart.js Doughnut Chart visualizing video resolution and storage breakdown.
+        - Directory Data Tables: Pure HTML/Tailwind dynamic tables driven by JS data models.
+        - Unicode Icons: Used text emoji icons (📁, 🔍, ⚡, ⚖️, ⚙️, 📊, 📋, 📖) to strictly comply with NO SVG mandate.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Section -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-amber-500 text-slate-900 text-xs font-black uppercase px-2 py-0.5 rounded tracking-wider">Government Deepfake Detection</span>
+                        <span class="text-xs text-slate-400 font-mono">MPTC / Cybersecurity Framework 2026</span>
+                    </div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
+                        Cambodian Facial Dataset Sourcing & Engineering Hub
+                    </h1>
+                </div>
+                <!-- Quick KPI Metrics Header -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div class="bg-slate-800/80 p-2 rounded border border-slate-700">
+                        <div class="text-xs text-slate-400">Target Goal</div>
+                        <div class="text-lg font-bold text-amber-400">10,000 Faces</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2 rounded border border-slate-700">
+                        <div class="text-xs text-slate-400">Seed URLs</div>
+                        <div class="text-lg font-bold text-indigo-400">73 Direct</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2 rounded border border-slate-700">
+                        <div class="text-xs text-slate-400">Archive Pool</div>
+                        <div class="text-lg font-bold text-emerald-400">300,000+ Vids</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2 rounded border border-slate-700">
+                        <div class="text-xs text-slate-400">Target Duration</div>
+                        <div class="text-lg font-bold text-sky-400">≤ 15 Mins</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <nav class="flex space-x-1 sm:space-x-3 mt-4 border-t border-slate-800 pt-3 overflow-x-auto text-sm font-medium">
+                <button onclick="switchTab('linksTab')" id="btn-linksTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap active-tab bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">
+                    🔗 73 Seed Video Links
+                </button>
+                <button onclick="switchTab('simulatorTab')" id="btn-simulatorTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">
+                    📊 Dataset Math Simulator
+                </button>
+                <button onclick="switchTab('channelsTab')" id="btn-channelsTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">
+                    📺 Channel Directory
+                </button>
+                <button onclick="switchTab('keywordsTab')" id="btn-keywordsTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">
+                    ⚡ Command Generator
+                </button>
+                <button onclick="switchTab('pipelineTab')" id="btn-pipelineTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">
+                    ⚖️ CV & Legal Standard
+                </button>
+                <button onclick="switchTab('readmeTab')" id="btn-readmeTab" class="tab-btn px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap">
+                    📖 User Manual / README
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- TAB 1: SEED VIDEO LINKS REPOSITORY -->
+        <section id="linksTab" class="tab-content space-y-6">
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Curated Seed Repository (73 Verified YouTube Videos)</h2>
+                <p class="text-sm text-slate-600">
+                    This interactive repository contains 73 manually verified YouTube video links collected from Cambodian government spokesperson units, state media (TVK), line ministries, and major high-definition broadcast channels. Each video features clear frontal or three-quarter facial angles of Cambodian officials, spokespersons, and everyday citizens under controlled studio or outdoor lighting. Use the search bar and filters below to copy URLs directly into your download queue.
+                </p>
+            </div>
+
+            <!-- Filters and Search Bar -->
+            <div class="bg-slate-100 p-4 rounded-lg border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="w-full md:w-1/3 relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                    <input type="text" id="linkSearch" oninput="filterLinks()" placeholder="Search title, official, channel, or ID..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div class="w-full md:w-2/3 flex flex-wrap gap-2 justify-end">
+                    <select id="categoryFilter" onchange="filterLinks()" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="ALL">All Categories (73)</option>
+                        <option value="GOV_PRESS">Gov Press Briefings & Spokespersons (21)</option>
+                        <option value="MINISTRY">Ministry & Legislative Statements (18)</option>
+                        <option value="NEWS_FIELD">Broadcast News, Interviews & Field Reports (34)</option>
+                    </select>
+                    <button onclick="copyAllFilteredLinks()" class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2 rounded-md transition flex items-center gap-1.5">
+                        📋 Copy Filtered URLs (<span id="linkCountBadge">73</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table of Links -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-slate-700">
+                        <thead class="bg-slate-50 text-slate-900 font-semibold border-b border-slate-200 sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3 px-4">#</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Source Channel</th>
+                                <th class="py-3 px-4">Video Title & Content Description</th>
+                                <th class="py-3 px-4 text-center">Direct Link</th>
+                                <th class="py-3 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linksTableBody" class="divide-y divide-slate-200">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: DATASET MATH & SAMPLING SIMULATOR -->
+        <section id="simulatorTab" class="tab-content hidden space-y-6">
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Dataset Engineering & Frame Sampling Simulator</h2>
+                <p class="text-sm text-slate-600">
+                    Extracting every consecutive frame (30 fps) from a video leads to severe overfitting and data leakage during deepfake detector training. International computer vision benchmarks (FaceForensics++, Celeb-DF v2, KoDF, and FMFCC-V) rely on uniform temporal sampling (10 to 50 frames per video). Use this interactive calculator to adjust sampling density, compute required download volumes, estimate storage footprints, and assess generalization risk.
+                </p>
+            </div>
+
+            <!-- Controls and Dynamic Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controls Panel -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="text-md font-bold text-slate-900 border-b border-slate-200 pb-2">Simulator Parameters</h3>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm font-medium text-slate-700 mb-1">
+                            <label for="targetImages">Target Face Images:</label>
+                            <span id="targetImagesVal" class="font-bold text-amber-600">10,000</span>
+                        </div>
+                        <input type="range" id="targetImages" min="1000" max="50000" step="1000" value="10000" oninput="updateSimulator()" class="w-full accent-amber-500">
+                        <span class="text-xs text-slate-500">Set overall target dataset size (Goal: 10,000 before end of year).</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-sm font-medium text-slate-700 mb-1">
+                            <label for="fpsSample">Frames Extracted per Video:</label>
+                            <span id="fpsSampleVal" class="font-bold text-indigo-600">32 frames/vid</span>
+                        </div>
+                        <input type="range" id="fpsSample" min="5" max="100" step="1" value="32" oninput="updateSimulator()" class="w-full accent-indigo-600">
+                        <span class="text-xs text-slate-500">Uniform temporal stride across video duration (Protocol B standard = 32).</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-sm font-medium text-slate-700 mb-1">
+                            <label for="avgDuration">Avg Video Duration (Mins):</label>
+                            <span id="avgDurationVal" class="font-bold text-slate-700">6.5 mins</span>
+                        </div>
+                        <input type="range" id="avgDuration" min="1" max="15" step="0.5" value="6.5" oninput="updateSimulator()" class="w-full accent-slate-700">
+                        <span class="text-xs text-slate-500">Constrained by project max limit of 15 minutes.</span>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded border border-slate-200 space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Videos Required:</span>
+                            <span id="calcVideosNeeded" class="font-bold text-slate-900">313 videos</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Est. Raw Download Size:</span>
+                            <span id="calcDownloadSize" class="font-bold text-slate-900">33.9 GB (1080p)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Est. Cropped Storage:</span>
+                            <span id="calcCropSize" class="font-bold text-slate-900">1.2 GB (224x224)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Redundancy / Leakage Risk:</span>
+                            <span id="calcRiskBadge" class="font-bold px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800">LOW (Optimal)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Container -->
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-1">Benchmark Protocol Comparison</h4>
+                            <p class="text-xs text-slate-500 mb-4">Videos needed to reach 10,000 cropped faces across sampling models.</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="protocolChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-1">Estimated Storage Footprint Breakdown</h4>
+                            <p class="text-xs text-slate-500 mb-4">Raw 1080p video downloads vs cropped face image cache.</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="storageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: OFFICIAL CHANNEL & PLAYLIST DIRECTORY -->
+        <section id="channelsTab" class="tab-content hidden space-y-6">
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Master Cambodian Official Channel & Bulk Playlist Directory</h2>
+                <p class="text-sm text-slate-600">
+                    Rather than searching for videos manually, pointing ingestion scripts at official YouTube channel uploads playlists allows automated queueing of thousands of verified clips. Below is the structured catalog of official Cambodian state broadcasters (`@tvkcambodia`), government spokesperson units, line ministries, and major commercial news networks.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="channelsContainer">
+                <!-- Dynamically populated channel cards -->
+            </div>
+        </section>
+
+        <!-- TAB 4: KHMER KEYWORD & YT-DLP COMMAND BUILDER -->
+        <section id="keywordsTab" class="tab-content hidden space-y-6">
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Automated Khmer Keyword & Scraper Command Generator</h2>
+                <p class="text-sm text-slate-600">
+                    To expand your dataset beyond the seed links, automated discovery scripts must query official Khmer terminology used by news editors and government spokespersons. Select target categories below to synthesize ready-to-use search strings and `yt-dlp` terminal execution scripts that enforce your 15-minute duration cap.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Command Controls -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-md font-bold text-slate-900 border-b border-slate-200 pb-2">Scraper Configurator</h3>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Target Video Format:</label>
+                        <select id="cmdFormat" onchange="generateCommand()" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-md px-3 py-2">
+                            <option value="PRESS">Official Statement (សេចក្តីថ្លែងការណ៍)</option>
+                            <option value="INTERVIEW">Studio Interview (កិច្ចសម្ភាសន៍)</option>
+                            <option value="NEWS">National News Bulletin (ព័ត៌មានជាតិ)</option>
+                            <option value="FIELD">Field Feature Report (បទយកការណ៍)</option>
+                            <option value="EXECUTIVE">Executive Remarks (ប្រសាសន៍ដើម)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Target Institution Channel:</label>
+                        <select id="cmdChannel" onchange="generateCommand()" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-md px-3 py-2">
+                            <option value="RGSU">Royal Gov Spokesperson Unit (RGSU)</option>
+                            <option value="TVK">National TV of Cambodia (TVK)</option>
+                            <option value="MCS">Ministry of Civil Service</option>
+                            <option value="BTV">BTV News Cambodia</option>
+                            <option value="FRESH">Fresh News Video</option>
+                            <option value="AMS">AMS Central</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Max Duration Constraint:</label>
+                        <select id="cmdDuration" onchange="generateCommand()" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-md px-3 py-2">
+                            <option value="900">15 Minutes (900s - Max Limit)</option>
+                            <option value="600">10 Minutes (600s)</option>
+                            <option value="300">5 Minutes (300s)</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded border border-amber-200 text-xs text-amber-900">
+                        <strong>Filter Note:</strong> Commands automatically append parameters to filter out multi-hour Kun Khmer boxing streams (`ប្រដាល់គុនខ្មែរ`) and TV dramas (`រឿងភាគ`).
+                    </div>
+                </div>
+
+                <!-- Generated Command Output -->
+                <div class="lg:col-span-2 bg-slate-900 text-slate-100 p-5 rounded-lg border border-slate-800 font-mono text-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-4">
+                            <span class="text-amber-400 font-bold text-sm">Bash / Terminal Command Output</span>
+                            <button onclick="copyGeneratedCommand()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-sans font-bold px-3 py-1 rounded text-xs transition">
+                                📋 Copy Script
+                            </button>
+                        </div>
+                        <pre id="commandOutput" class="whitespace-pre-wrap break-all text-emerald-400 leading-relaxed"></pre>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-800 text-slate-400 font-sans text-xs">
+                        <strong>Python Execution Hint:</strong> Pass these arguments into Python's `subprocess` or `yt_dlp.YoutubeDL({'match_filter': 'duration <= 900 & title !~= (KUN KHMER|ប្រដាល់)'})` for automated ingestion.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: COMPUTER VISION PIPELINE & LEGAL CHECKLIST -->
+        <section id="pipelineTab" class="tab-content hidden space-y-6">
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Computer Vision Pipeline & Legal Compliance Standard</h2>
+                <p class="text-sm text-slate-600">
+                    To deliver a dataset ready for government deepfake evaluation, the pipeline must strictly implement benchmark face cropping standards while maintaining full compliance with Cambodian data regulations, including Sub-Decree 252 (Personal Identification Data) and MPTC 2026 directives.
+                </p>
+            </div>
+
+            <!-- Technical Specification Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- RetinaFace Cropping Standard -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-md font-bold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <span>⚙️</span> RetinaFace Bounding-Box Protocol
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span><strong>Landmark Alignment:</strong> Detect 5 facial landmarks (eyes, nose, mouth corners) using RetinaFace to geometrically align roll and tilt before cropping.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span><strong>1.3× Box Expansion:</strong> Expand raw face bounding boxes by 1.3× to capture outer jawline, chin, and forehead boundaries where deepfake boundary artifacts occur.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span><strong>Standard Resizing:</strong> Resize all face crops to standard 224 × 224 pixels PNG format for model ingestion.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span><strong>Confidence Thresholding:</strong> Discard crops with detection confidence &lt; 0.95 or width &lt; 120 pixels to filter out low-res crowd backgrounds.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cambodian Legal & Regulatory Compliance -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-md font-bold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <span>⚖️</span> Cambodian Legal Compliance Checklist
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-600 font-bold">✓</span>
+                            <span><strong>Sub-Decree No. 252 (2021):</strong> Data collection directly serves public interest, cyber safety, and national security under MPTC governance.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-600 font-bold">✓</span>
+                            <span><strong>Public Domain Provenance:</strong> Sourced exclusively from official broadcasts (`@tvkcambodia`, line ministries, public press conferences).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-600 font-bold">✓</span>
+                            <span><strong>Draft Personal Data Protection Law (2026):</strong> Maintained by authorized public institutions acting within national security mandates.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-600 font-bold">✓</span>
+                            <span><strong>Provenance Manifest (`metadata.json`):</strong> Every frame logs `source_url`, `channel_handle`, `timestamp`, and `frame_idx` for auditing.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: EMBEDDED USER MANUAL & README -->
+        <section id="readmeTab" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded border border-amber-300">Documentation & User Manual</span>
+                        <span class="text-xs text-slate-500 font-mono">System Version 2.4</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-2">Cambodian Facial Dataset Sourcing & Engineering Hub</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        A single-page interactive web application (SPA) designed for data analysts, computer vision engineers, and teams working on government-grade Cambodian face dataset collection and deepfake detection projects.
+                    </p>
+                </div>
+
+                <hr class="border-slate-200">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <h3 class="text-md font-bold text-slate-900 flex items-center gap-2">
+                            <span>🚀</span> Overview & Objectives
+                        </h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            To train robust deepfake detectors capable of safeguarding Cambodian public communications, engineers 
+                            require a balanced dataset of Cambodian facial images. Manual searching is time-consuming and inefficient. 
+                            This tool provides a centralized, interactive control center to streamline the acquisition of high-quality face images of Cambodian individuals 
+                            from official and public broadcast sources. Rather than performing manual video searches, 
+                            by this, allows teams to explore pre-verified YouTube seed links, simulate frame sampling parameters,
+                            build automated scraping commands, and enforcing frame sampling standards.
+                            So, this interactive control panel eliminates manual search overhead by curating 73 verified YouTube links. 
+        
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-md font-bold text-slate-900 flex items-center gap-2">
+                            <span>🎯</span> Target Benchmark
+                        </h3>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200 space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Total Face Images:</span>
+                                <span class="font-bold text-slate-900">10,000 Faces</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Target Timeline:</span>
+                                <span class="font-bold text-amber-600">End of 2026</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Sampling Protocol:</span>
+                                <span class="font-bold text-indigo-600">Protocol B (32 frames/vid)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Video Cap:</span>
+                                <span class="font-bold text-emerald-600">≤ 15 Minutes (900s)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-md font-bold text-slate-900 border-b border-slate-200 pb-2">Module-by-Module User Guide</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>🔗</span> 1. Seed Link Explorer
+                            </div>
+                            <p class="text-xs text-slate-600">Filter all 73 verified seed links by category (Gov Press, Ministry, News). Search titles or channels, and use the <strong>Copy Filtered URLs</strong> button to feed your Python ingestion pipeline.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>📊</span> 2. Sampling Simulator
+                            </div>
+                            <p class="text-xs text-slate-600">Adjust sliders for dataset goals and sampling rate. Automatically computes required videos count, raw 1080p bandwidth, and 224x224 crop storage footprint to avoid data leakage.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>📺</span> 3. Channel Directory
+                            </div>
+                            <p class="text-xs text-slate-600">Access official master channel upload playlists (`@tvkcambodia`, RGSU, Ministry channels) for automated bulk scraping of entire video archives.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>⚡</span> 4. Command Generator
+                            </div>
+                            <p class="text-xs text-slate-600">Select target video formats and duration caps to output copy-paste `yt-dlp` bash scripts pre-configured with title exclusions for sports and TV series.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>⚙️</span> 5. CV Cropping Standard
+                            </div>
+                            <p class="text-xs text-slate-600">Step-by-step specifications for 5-landmark alignment, 1.3× bounding-box expansion, and 224×224 pixel normalization for RetinaFace detectors.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded border border-slate-200">
+                            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                <span>⚖️</span> 6. Legal & Regulatory
+                            </div>
+                            <p class="text-xs text-slate-600">Compliance checklist ensuring alignment with Sub-Decree No. 252 (2021) and MPTC Cybersecurity Directives for public domain government research.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900 flex justify-between items-center">
+                    <div>
+                        <strong>System Note:</strong> This application operates entirely client-side with zero external data transmissions, maintaining confidentiality for state cybersecurity operations.
+                    </div>
+                    <button onclick="switchTab('linksTab')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded transition font-sans">
+                        Start Exploring Seeds ↗
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-bold text-slate-200">Cambodian Government Deepfake Detection Dataset Playbook</p>
+                <p class="text-slate-500 mt-0.5">Aligned for internal use only (Oct 2026) & International Dataset of Computer Vision Benchmarks</p>
+            </div>
+            <div class="text-right text-slate-500">
+                <p>10,000 Face Target Collection Plan</p>
+                <p>Single-Page Interactive Dashboard</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Embedded JavaScript Data & Logic -->
+    <script>
+        // JS Data Model: 73 Curated Links
+        const seedLinksData = [
+            // GOV PRESS BRIEFINGS (1-21)
+            { id: 1, cat: 'GOV_PRESS', channel: 'RGSU (@cambodiaroyalgovernmentspo2555)', title: 'Official Statement on Cambodia-Thailand Border & Gov News', url: 'https://www.youtube.com/watch?v=6QK-cXZKbZE', desc: 'Podium statement by H.E. Pen Bona at Council of Ministers' },
+            { id: 2, cat: 'GOV_PRESS', channel: 'TVK (@tvkcambodia)', title: 'PM Hun Manet receives Philippine Agriculture Minister Laurel Jr.', url: 'https://www.youtube.com/watch?v=jPKkIYDcLY0', desc: 'HD bilateral meeting clip (3:07–3:33 duration)' },
+            { id: 3, cat: 'GOV_PRESS', channel: 'TVK (@tvkcambodia)', title: 'Official Statement: Cambodia-Thailand Border Situation Update', url: 'https://www.youtube.com/watch?v=cuo0g8eIzX8', desc: 'Short official border update statement' },
+            { id: 4, cat: 'GOV_PRESS', channel: 'TVK (@tvkcambodia)', title: 'Official Statement: Cambodia-Thailand Border Update (Oct 12)', url: 'https://www.youtube.com/watch?v=8Leqm9UjiqY', desc: 'Short official border update statement' },
+            { id: 5, cat: 'GOV_PRESS', channel: 'TVK (@tvkcambodia)', title: 'Official Statement: Cambodia-Thailand Border Update (Oct 21)', url: 'https://www.youtube.com/watch?v=2axF_sKBlyo', desc: 'Short official border update statement' },
+            { id: 6, cat: 'GOV_PRESS', channel: 'Official News Upload', title: 'Remarks by H.E. Pen Bona, Head of RGSU', url: 'https://www.youtube.com/watch?v=KpK3HcU4WNU', desc: 'Single-speaker podium framing' },
+            { id: 7, cat: 'GOV_PRESS', channel: 'Official News Upload', title: 'Briefing by H.E. Pen Bona, Head of RGSU', url: 'https://www.youtube.com/watch?v=xGMdrliDh7c', desc: 'Single-speaker podium framing' },
+            { id: 8, cat: 'GOV_PRESS', channel: 'RGSU (@cambodiaroyalgovernmentspo2555)', title: 'Special Briefing with Deputy PM & Foreign Minister Prak Sokhonn', url: 'https://www.youtube.com/watch?v=Gct-Q9scX08', desc: 'Official ministerial interview clip' },
+            { id: 9, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Joint Press Conference by PM Hun Manet & Azerbaijan President', url: 'https://www.youtube.com/watch?v=-uctATq7PCI', desc: 'Dual-podium HD press conference (11:54)' },
+            { id: 10, cat: 'GOV_PRESS', channel: 'Cambodia 2025 / PRU', title: 'Joint Press Conference: PM Hun Manet & H.E. Ilham Aliyev', url: 'https://www.youtube.com/watch?v=-EadXHjSSDE', desc: 'Short diplomatic press conference segment' },
+            { id: 11, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Official Statement: Border Update & Gov News (Oct 26)', url: 'https://www.youtube.com/watch?v=anfLrwi0NjY', desc: 'Official government press update' },
+            { id: 12, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Special Interview on Francophonie Village Side Events', url: 'https://www.youtube.com/watch?v=Vr40u7vX_Jw', desc: 'Studio/official diplomatic interview' },
+            { id: 13, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Special Interview on 20th Francophonie Summit', url: 'https://www.youtube.com/watch?v=Ghk2Q2pO25M', desc: 'Official spokesperson interview' },
+            { id: 14, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Roundtable Discussion on Preahreacha Khnar Temple Border Issue', url: 'https://www.youtube.com/watch?v=PiD6Vng6AZE', desc: 'Multi-speaker official roundtable' },
+            { id: 15, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'UN Resident Coordinator Speech & 20th Anniv RCAF UN Peacekeepers', url: 'https://www.youtube.com/watch?v=0Wnh6uBVRqA', desc: 'Official ceremony podium speech' },
+            { id: 16, cat: 'GOV_PRESS', channel: 'PRU (@pressandquickreactionunit)', title: 'Official Press Summary & Diplomatic Coverage in Azerbaijan', url: 'https://www.youtube.com/watch?v=jO5sjv5aKf0', desc: 'Official summary briefing' },
+            { id: 17, cat: 'GOV_PRESS', channel: 'RGSU (@cambodiaroyalgovernmentspo2555)', title: 'Statement: Cambodia-Thailand Border & Gov News (Oct 23)', url: 'https://m.youtube.com/watch?v=bWTzfAokHXY', desc: 'Official press update statement' },
+            { id: 18, cat: 'GOV_PRESS', channel: 'BTV News (@btvnewstv)', title: 'FULL PRESS: Evolution of Border Situation & Gov News', url: 'https://www.youtube.com/watch?v=QFQpX7iIyOQ', desc: 'Full official press conference (7m)' },
+            { id: 19, cat: 'GOV_PRESS', channel: 'Fresh News (@freshnewsvideo)', title: 'Live Update: RGSU Special Update on Border Situation', url: 'https://www.youtube.com/watch?v=uXgx4GXCvhk', desc: 'Spokesperson live update stream clip' },
+            { id: 20, cat: 'GOV_PRESS', channel: 'Mekong Post / Official', title: 'Council of Ministers Statement on Border News', url: 'https://www.youtube.com/watch?v=d9rFUdZc-Ek', desc: 'Official Council of Ministers feed' },
+            { id: 21, cat: 'GOV_PRESS', channel: 'Official Conference Feed', title: 'Press Conference: ICCOS 2026 Online Scams Conference', url: 'https://www.youtube.com/watch?v=VMI4Yqu3gwM', desc: 'Multi-speaker official press briefing' },
+
+            // MINISTRY & LEGISLATIVE STATEMENTS (22-39)
+            { id: 22, cat: 'MINISTRY', channel: 'BTV News (@btvnewstv)', title: 'MoEYS Spokesperson Dr. Khuon Vicheka Exam Statement', url: 'https://www.youtube.com/watch?v=skRsFZpsmGc', desc: 'Female spokesperson announcement clip' },
+            { id: 23, cat: 'MINISTRY', channel: 'Official News Upload', title: 'Remarks by H.E. Maly Socheata, Defense Ministry Spokesperson', url: 'https://www.youtube.com/watch?v=3KEw8ldaWKY', desc: 'Female defense spokesperson statement' },
+            { id: 24, cat: 'MINISTRY', channel: 'Hang Meas / Official', title: 'Press Briefing by H.E. Maly Socheata, Defense Spokesperson', url: 'https://www.youtube.com/watch?v=yWU6RBbeONo', desc: 'Short defense press briefing' },
+            { id: 25, cat: 'MINISTRY', channel: 'Official News Upload', title: 'Clarification by H.E. Phan Rim, MPWT Spokesperson', url: 'https://www.youtube.com/watch?v=14Rm2CnzFnw', desc: 'Male public works spokesperson clip' },
+            { id: 26, cat: 'MINISTRY', channel: 'Official News Upload', title: 'Appeal by Ministry of Information Spokesperson', url: 'https://www.youtube.com/watch?v=Xiuk23vEn_M', desc: 'Short official announcement' },
+            { id: 27, cat: 'MINISTRY', channel: 'Ministry of Info (@informationcambodia)', title: 'Interview: H.E. Khim Finan (MAFF Spokesperson) on Rice Exports', url: 'https://www.youtube.com/watch?v=vHYT_eQnmKE', desc: 'Clear studio interview with agriculture official' },
+            { id: 28, cat: 'MINISTRY', channel: 'Ministry of Civil Service (@MinistryofCivilService)', title: 'Interview: H.E. Kong Sophy on Civil Service Reform', url: 'https://www.youtube.com/watch?v=o9x3h2kMs9o', desc: 'Short HD ministry interview clip' },
+            { id: 29, cat: 'MINISTRY', channel: 'Ministry of Civil Service (@MinistryofCivilService)', title: '2nd Reform Forum on Recruitment System with H.E. Kong Sophy', url: 'https://www.youtube.com/watch?v=l87UF9lQod4', desc: 'Short HD civil service forum remarks' },
+            { id: 30, cat: 'MINISTRY', channel: 'Ministry of Civil Service (@MinistryofCivilService)', title: 'Explainer Video on Civil Servant Census Operations', url: 'https://www.youtube.com/watch?v=yejJG54vHs4', desc: 'Short operational briefing (≤12m)' },
+            { id: 31, cat: 'MINISTRY', channel: 'BTV News (@btvnewstv)', title: 'Civil Service Ministry Exam Results Announcement', url: 'https://www.youtube.com/watch?v=xsxjlGu3_wM', desc: 'Short news announcement clip' },
+            { id: 32, cat: 'MINISTRY', channel: 'Ministry of Civil Service (@MinistryofCivilService)', title: 'Official Statement on Ministry Achievements', url: 'https://www.youtube.com/watch?v=IoaOqWvzVIQ', desc: 'Short institutional video' },
+            { id: 33, cat: 'MINISTRY', channel: 'BTV News (@btvnewstv)', title: 'Special Interview: Foreign Minister Prak Sokhonn on UNCLOS', url: 'https://www.youtube.com/watch?v=bvVuiSwxgl4', desc: 'High-clarity ministerial interview' },
+            { id: 34, cat: 'MINISTRY', channel: 'MFAIC (@MFAICCambodia)', title: 'Official Briefing from Ministry of Foreign Affairs', url: 'https://www.youtube.com/watch?v=vpiJujDHEEw', desc: 'Official diplomatic briefing video' },
+            { id: 35, cat: 'MINISTRY', channel: 'MPTC Upload', title: 'Ministry of Post & Telecommunications Cooperation Video', url: 'https://www.youtube.com/watch?v=hFuwVZU31GE', desc: 'Official ICT ministry footage' },
+            { id: 36, cat: 'MINISTRY', channel: 'National Assembly (@NationalAssemblyOfCambodia)', title: 'National Assembly Briefing to UN Representative on Border', url: 'https://www.youtube.com/watch?v=9K88GajBBZM', desc: 'Parliamentary diplomatic briefing' },
+            { id: 37, cat: 'MINISTRY', channel: 'BTV / National Assembly', title: 'National Assembly Meeting with German Delegation', url: 'https://www.youtube.com/watch?v=njp9or6JmFg', desc: 'Short parliamentary news clip' },
+            { id: 38, cat: 'MINISTRY', channel: 'Fresh News (@freshnewsvideo)', title: 'National Assembly President Congratulatory Statement', url: 'https://www.youtube.com/watch?v=mi1SktCWl3Q', desc: 'Short official reading' },
+            { id: 39, cat: 'MINISTRY', channel: 'National Bank of Cambodia', title: 'Central Bank Official Explaining 50k & 100k Riel Banknotes', url: 'https://www.youtube.com/shorts/pKBdSlcufmk', desc: 'YouTube Short (≤1m) frontal explainer' },
+
+            // BROADCAST NEWS, INTERVIEWS & FIELD REPORTS (40-73)
+            { id: 40, cat: 'NEWS_FIELD', channel: 'Fresh News (@freshnewsvideo)', title: 'PM Hun Manet Speech to Turkish Investors in Istanbul', url: 'https://www.youtube.com/watch?v=33oaWD0D-rM', desc: 'Short executive speech clip' },
+            { id: 41, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'PM Hun Manet Directs Strict Law Enforcement & Scam Crackdowns', url: 'https://www.youtube.com/watch?v=CFgatuRUmKw', desc: 'Short executive remarks clip' },
+            { id: 42, cat: 'NEWS_FIELD', channel: 'Fresh News (@freshnewsvideo)', title: 'PM Hun Manet Requests ASEAN Observers on Border Demarcation', url: 'https://www.youtube.com/watch?v=ijAXCDWszHA', desc: 'Short executive statement clip' },
+            { id: 43, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'PM Hun Manet Meetings with Investment Delegations', url: 'https://www.youtube.com/watch?v=8mWZKAie91c', desc: 'Bilateral meeting news report' },
+            { id: 44, cat: 'NEWS_FIELD', channel: 'TVK (@tvkcambodia)', title: 'National News 3:00 PM Bulletin (Oct 19)', url: 'https://www.youtube.com/watch?v=Cfj2L3_23Vo', desc: 'Studio news anchor bulletin' },
+            { id: 45, cat: 'NEWS_FIELD', channel: 'TVK (@tvkcambodia)', title: 'National News 5:00 PM Bulletin (Aug 3)', url: 'https://www.youtube.com/watch?v=dCfxYMmF9fU', desc: 'Studio anchor bulletin (9-11m)' },
+            { id: 46, cat: 'NEWS_FIELD', channel: 'TVK (@tvkcambodia)', title: 'Weekly National News Roundup', url: 'https://www.youtube.com/watch?v=6Tu5BuI-C18', desc: 'Studio anchor roundup' },
+            { id: 47, cat: 'NEWS_FIELD', channel: 'Ministry of Info (@informationcambodia)', title: 'National Radio/TVK News & Water Level Forecast', url: 'https://www.youtube.com/watch?v=XoqJR2_iQ2w', desc: 'Short news bulletin' },
+            { id: 48, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Feature: Garment Workers React to Minimum Wage Increase', url: 'https://www.youtube.com/watch?v=rTTiwPRreTk', desc: 'Field feature report with diverse worker faces' },
+            { id: 49, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Feature: Citizens Thank Government for Fuel Subsidies', url: 'https://www.youtube.com/watch?v=BeZe3ex0vXg', desc: 'Field feature report (10:43 duration)' },
+            { id: 50, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Feature: Peace as Key Factor for National Holidays', url: 'https://www.youtube.com/watch?v=hSFLJ6xvAGU', desc: 'Short field feature report' },
+            { id: 51, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Feature: Historic 1M Ton Rice Export Milestone', url: 'https://www.youtube.com/watch?v=hbJe4uqxJv8', desc: 'Agricultural/trade feature report' },
+            { id: 52, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Feature: Restoration of Srah Srang Temple in Siem Reap', url: 'https://www.youtube.com/watch?v=LWCkNikB9ow', desc: 'Cultural field feature report' },
+            { id: 53, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Interview with Sourn Serey Ratha on UNCLOS Meeting', url: 'https://www.youtube.com/watch?v=8iSgmsjuTTY', desc: 'Studio talking-head interview' },
+            { id: 54, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Interview: Weekly Social/Political Q&A with Sourn Serey Ratha', url: 'https://www.youtube.com/watch?v=mEmBXY9o6Jw', desc: 'Two-person studio interview with female host Pov Reaksa' },
+            { id: 55, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Interview: Weekly Political Event Response', url: 'https://www.youtube.com/watch?v=tC5HowfOAAY', desc: 'Two-person studio interview' },
+            { id: 56, cat: 'NEWS_FIELD', channel: 'BTV News (@btvnewstv)', title: 'Economic Interview: Gold Market Price Fluctuations', url: 'https://www.youtube.com/watch?v=uZWKKP2oAao', desc: 'Studio economic interview' },
+            { id: 57, cat: 'NEWS_FIELD', channel: 'Fresh News (@freshnewsvideo)', title: 'Interview with Researcher Ieng Pisei on Triangle Strategy', url: 'https://www.youtube.com/watch?v=eRUo2uOWblQ', desc: 'Clear studio talking-head interview' },
+            { id: 58, cat: 'NEWS_FIELD', channel: 'Fresh News (@freshnewsvideo)', title: 'Fresh Talk: Mar Yarith Commentary on Dispute Resolution', url: 'https://www.youtube.com/watch?v=-l5MHLNh2Z0', desc: 'Short close-up commentary clip' },
+            { id: 59, cat: 'NEWS_FIELD', channel: 'Hang Meas (@HM_FlashNews)', title: 'Flash News (12PM): Military Conscription & Aviation University', url: 'https://www.youtube.com/watch?v=-DtoxEq3_60', desc: 'HD studio anchor & field report' },
+            { id: 60, cat: 'NEWS_FIELD', channel: 'Hang Meas (@HM_FlashNews)', title: 'Flash News (8PM): Interior Minister Anti-Corruption Directive', url: 'https://www.youtube.com/watch?v=VskzhAaVYGU', desc: 'HD studio anchor & ministerial report' },
+            { id: 61, cat: 'NEWS_FIELD', channel: 'Hang Meas (@HM_FlashNews)', title: 'Flash News (12PM): US Secretary Reminder on KL Peace Agreement', url: 'https://www.youtube.com/watch?v=BWahxe1hAZk', desc: 'Short daily news segment' },
+            { id: 62, cat: 'NEWS_FIELD', channel: 'Hang Meas (@HM_FlashNews)', title: 'Flash News (12PM) Studio News Segment', url: 'https://www.youtube.com/watch?v=O_v3wTil_BE', desc: 'Short studio news segment' },
+            { id: 63, cat: 'NEWS_FIELD', channel: 'Hang Meas (@HM_FlashNews)', title: 'Flash News (12PM) News Anchor Report', url: 'https://www.youtube.com/watch?v=_tLatRfH3_w', desc: 'Short studio news segment' },
+            { id: 64, cat: 'NEWS_FIELD', channel: 'AMS Central (@amscentral8552)', title: 'PM Hun Manet Organizes Meals for Children with Disabilities', url: 'https://www.youtube.com/watch?v=U59kM6Qyy9g', desc: 'Short HD news report (1-6m)' },
+            { id: 65, cat: 'NEWS_FIELD', channel: 'AMS Central (@amscentral8552)', title: 'Cambodia-Malaysia Legislative Role in Peacebuilding', url: 'https://www.youtube.com/watch?v=qCyGu4YOhlM', desc: 'Short HD news clip (1-4m)' },
+            { id: 66, cat: 'NEWS_FIELD', channel: 'AMS Central (@amscentral8552)', title: 'Kampot Provincial Governor Warns Market Investors', url: 'https://www.youtube.com/watch?v=9yMiB-sgKss', desc: 'Short provincial official report' },
+            { id: 67, cat: 'NEWS_FIELD', channel: 'AMS Central (@amscentral8552)', title: 'Land Management Resolution & Financial Literacy in Pursat', url: 'https://www.youtube.com/watch?v=LdLjTvhxB98', desc: 'Short HD news report' },
+            { id: 68, cat: 'NEWS_FIELD', channel: 'AMS Central (@amscentral8552)', title: 'Eco-Tourism Feature: Chi Aing Waterfall during Pchum Ben', url: 'https://www.youtube.com/watch?v=dH-NkcHDlwI', desc: '2:01 min field report' },
+            { id: 69, cat: 'NEWS_FIELD', channel: 'SBM News (@SBMNewskh)', title: 'Cambodia Presents Official Border Temple Maps', url: 'https://www.youtube.com/watch?v=8URqv8_mT4s', desc: 'Short news presenter segment' },
+            { id: 70, cat: 'NEWS_FIELD', channel: 'Kampuchea Thmey (@tvkampucheathmey)', title: 'Report on Cambodian Cultural Heritage & Inscriptions', url: 'https://www.youtube.com/watch?v=JCD5jtaOFbY', desc: 'Short cultural news segment' },
+            { id: 71, cat: 'NEWS_FIELD', channel: 'PNN TV News (@PNNTVNEWSOFFICIAL)', title: 'PNN TV Official Commercial News Report', url: 'https://www.youtube.com/watch?v=2ScQWqG5--0', desc: 'Short commercial news clip' },
+            { id: 72, cat: 'NEWS_FIELD', channel: 'Royal Academy of Cambodia', title: 'Dr. Sok Touch & Historians on Tourism and Scholarship', url: 'https://www.youtube.com/watch?v=uNEOSWF6l0M', desc: 'Academic talking-head segment' },
+            { id: 73, cat: 'NEWS_FIELD', channel: 'Fresh News (@freshnewsvideo)', title: 'PM Hun Manet Launch of MSME Strategy 2026-2030', url: 'https://www.youtube.com/watch?v=AlmkTYyo6iY', desc: 'Full ceremony stream (use section slicing)' }
+        ];
+
+        // JS Data Model: Channels Directory
+        const channelsData = [
+            { name: "National TV of Cambodia (TVK)", handle: "@tvkcambodia", subs: "346K", videos: "18,129", type: "State Broadcaster", desc: "Diplomatic meetings, border updates, afternoon bulletins. Master archive of official speakers.", playlistUrl: "https://www.youtube.com/playlist?list=UUupDvu26QCG36ORfsCXRq6A" },
+            { name: "Royal Gov Spokesperson Unit", handle: "@cambodiaroyalgovernmentspo2555", subs: "Official", videos: "4,687", type: "Government Unit", desc: "Podium statements by H.E. Pen Bona & spokespersons at Council of Ministers.", playlistUrl: "https://www.youtube.com/playlist?list=UUemuso-GfNJU6wMzfZ8zHlg" },
+            { name: "Press & Quick Reaction Unit", handle: "@pressandquickreactionunit", subs: "6.51K", videos: "6,000+", type: "Government Unit", desc: "Council of Ministers unit publishing special interviews, diplomatic conferences, and press summaries.", playlistUrl: "https://www.youtube.com/@pressandquickreactionunit/videos" },
+            { name: "Ministry of Information", handle: "@informationcambodia", subs: "45.6K", videos: "13,000", type: "Line Ministry", desc: "Daily TVK news segments (6-7m), spokesperson interviews, provincial progress reports.", playlistUrl: "https://www.youtube.com/@informationcambodia/playlists" },
+            { name: "Ministry of Civil Service", handle: "@MinistryofCivilService", subs: "3.52K", videos: "394", type: "Line Ministry", desc: "High ≤15m yield. HD interviews with Secretaries of State and diverse teacher candidates.", playlistUrl: "https://www.youtube.com/c/ministrycivilservice/videos" },
+            { name: "BTV News Cambodia", handle: "@btvnewstv", subs: "297K", videos: "49,000", type: "Commercial Network", desc: "Daily 2 to 12 minute standalone uploads. Ideal for quick scraping of diverse speakers.", playlistUrl: "https://www.youtube.com/@btvnewstv/playlists" },
+            { name: "Fresh News & Fresh News Plus", handle: "@freshnewsvideo / @FRESHNEWSPLUS", subs: "1.04M", videos: "122,000+", type: "Digital News", desc: "Largest news video repository in Cambodia. Short news clips, FRESH TALK, and live events.", playlistUrl: "https://www.youtube.com/playlist?list=UUVr5EhXSzbLSjeQsaL-xbpw" },
+            { name: "AMS Central (Apsara)", handle: "@amscentral8552", subs: "18.8K", videos: "18,000", type: "Digital Media", desc: "1 to 5 minute standalone news reports (Apsara Tonight, feature reports) perfect for sampling.", playlistUrl: "https://www.youtube.com/@amscentral8552/videos" }
+        ];
+
+        // Global Charts Variables
+        let protocolChartInstance = null;
+        let storageChartInstance = null;
+
+        // Initialize SPA Page
+        document.addEventListener("DOMContentLoaded", () => {
+            renderLinksTable(seedLinksData);
+            renderChannelsCards();
+            initCharts();
+            updateSimulator();
+            generateCommand();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500/20', 'text-amber-300', 'font-semibold', 'border', 'border-amber-500/30');
+                btn.classList.add('text-slate-300');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-amber-500/20', 'text-amber-300', 'font-semibold', 'border', 'border-amber-500/30');
+                activeBtn.classList.remove('text-slate-300');
+            }
+        }
+
+        // Render Table of 73 Seed Links
+        function renderLinksTable(data) {
+            const tbody = document.getElementById('linksTableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('linkCountBadge').innerText = data.length;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">No video links match your search filter.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                
+                let badgeColor = "bg-slate-100 text-slate-700 border-slate-300";
+                let catLabel = "Gov Press";
+                if(item.cat === 'GOV_PRESS') { badgeColor = "bg-amber-100 text-amber-800 border-amber-300"; catLabel = "Gov Press"; }
+                if(item.cat === 'MINISTRY') { badgeColor = "bg-indigo-100 text-indigo-800 border-indigo-300"; catLabel = "Ministry"; }
+                if(item.cat === 'NEWS_FIELD') { badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-300"; catLabel = "News & Field"; }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono text-xs text-slate-400">${item.id}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-xs border font-medium ${badgeColor}">${catLabel}</span>
+                    </td>
+                    <td class="py-3 px-4 font-medium text-slate-900">${item.channel}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-semibold text-slate-900">${item.title}</div>
+                        <div class="text-xs text-slate-500 mt-0.5">${item.desc}</div>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="text-amber-600 hover:text-amber-700 font-mono text-xs underline">
+                            Open Video ↗
+                        </a>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="copyToClipboard('${item.url}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded border border-slate-300 transition">
+                            📋 Copy URL
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filter Seed Links
+        function filterLinks() {
+            const query = document.getElementById('linkSearch').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            const filtered = seedLinksData.filter(item => {
+                const matchesCat = (category === 'ALL') || (item.cat === category);
+                const matchesSearch = item.title.toLowerCase().includes(query) ||
+                                      item.channel.toLowerCase().includes(query) ||
+                                      item.desc.toLowerCase().includes(query) ||
+                                      item.id.toString() === query;
+                return matchesCat && matchesSearch;
+            });
+
+            renderLinksTable(filtered);
+        }
+
+        // Copy Single URL
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            alert(`Copied URL to clipboard:\n${text}`);
+        }
+
+        // Copy All Filtered URLs
+        function copyAllFilteredLinks() {
+            const query = document.getElementById('linkSearch').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            const filtered = seedLinksData.filter(item => {
+                const matchesCat = (category === 'ALL') || (item.cat === category);
+                const matchesSearch = item.title.toLowerCase().includes(query) ||
+                                      item.channel.toLowerCase().includes(query) ||
+                                      item.desc.toLowerCase().includes(query);
+                return matchesCat && matchesSearch;
+            });
+
+            const urls = filtered.map(i => i.url).join('\n');
+            navigator.clipboard.writeText(urls);
+            alert(`Copied ${filtered.length} YouTube URL(s) to clipboard!`);
+        }
+
+        // Render Channels Cards
+        function renderChannelsCards() {
+            const container = document.getElementById('channelsContainer');
+            container.innerHTML = '';
+
+            channelsData.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between";
+                div.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-600">${c.type}</span>
+                                <h3 class="text-base font-bold text-slate-900">${c.name}</h3>
+                                <span class="text-xs font-mono text-slate-500">${c.handle}</span>
+                            </div>
+                            <span class="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-1 rounded border border-slate-200">${c.videos} videos</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-4">${c.desc}</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-xs text-slate-500">Subs: <strong>${c.subs}</strong></span>
+                        <a href="${c.playlistUrl}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3 py-1.5 rounded transition">
+                            View Uploads Playlist ↗
+                        </a>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Simulator Logic & Calculations
+        function updateSimulator() {
+            const target = parseInt(document.getElementById('targetImages').value);
+            const framesPerVid = parseInt(document.getElementById('fpsSample').value);
+            const duration = parseFloat(document.getElementById('avgDuration').value);
+
+            document.getElementById('targetImagesVal').innerText = target.toLocaleString();
+            document.getElementById('fpsSampleVal').innerText = `${framesPerVid} frames/vid`;
+            document.getElementById('avgDurationVal').innerText = `${duration} mins`;
+
+            const videosNeeded = Math.ceil(target / framesPerVid);
+            document.getElementById('calcVideosNeeded').innerText = `${videosNeeded.toLocaleString()} videos`;
+
+            // Est 1080p download size: ~15MB per minute
+            const rawMbPerVid = duration * 16.5;
+            const totalRawGb = ((videosNeeded * rawMbPerVid) / 1024).toFixed(1);
+            document.getElementById('calcDownloadSize').innerText = `${totalRawGb} GB (1080p)`;
+
+            // Est cropped face size: ~120KB per 224x224 image
+            const totalCropMb = (target * 0.12).toFixed(0);
+            const totalCropGb = (totalCropMb / 1024).toFixed(1);
+            document.getElementById('calcCropSize').innerText = `${totalCropMb} MB (${totalCropGb} GB)`;
+
+            // Risk Assessment
+            const riskBadge = document.getElementById('calcRiskBadge');
+            if(framesPerVid <= 15) {
+                riskBadge.innerText = "VERY LOW (Max Diversity)";
+                riskBadge.className = "font-bold px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800";
+            } else if(framesPerVid <= 35) {
+                riskBadge.innerText = "LOW (Optimal Benchmark)";
+                riskBadge.className = "font-bold px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800";
+            } else if(framesPerVid <= 60) {
+                riskBadge.innerText = "MODERATE (Asian Standard)";
+                riskBadge.className = "font-bold px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800";
+            } else {
+                riskBadge.innerText = "HIGH (Frame Redundancy Risk)";
+                riskBadge.className = "font-bold px-2 py-0.5 rounded text-xs bg-rose-100 text-rose-800";
+            }
+
+            updateCharts(target, totalRawGb, totalCropGb);
+        }
+
+        // Initialize Chart.js Data
+        function initCharts() {
+            // Protocol Bar Chart
+            const ctxProtocol = document.getElementById('protocolChart').getContext('2d');
+            protocolChartInstance = new Chart(ctxProtocol, {
+                type: 'bar',
+                data: {
+                    labels: ['Protocol A (10 f/v)', 'Protocol B (32 f/v)', 'Protocol C (50 f/v)', 'Protocol D (100 f/v)'],
+                    datasets: [{
+                        label: 'Videos Needed for Target',
+                        data: [1000, 313, 200, 100],
+                        backgroundColor: ['#6366f1', '#f59e0b', '#10b981', '#f43f5e'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Required Videos Count', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Storage Breakdown Doughnut Chart
+            const ctxStorage = document.getElementById('storageChart').getContext('2d');
+            storageChartInstance = new Chart(ctxStorage, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Raw Video Storage (GB)', 'Cropped Face Cache (GB)'],
+                    datasets: [{
+                        data: [33.9, 1.2],
+                        backgroundColor: ['#0f172a', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // Dynamic Chart Updates
+        function updateCharts(target, rawGb, cropGb) {
+            if(!protocolChartInstance || !storageChartInstance) return;
+
+            // Update Protocol Chart based on target
+            protocolChartInstance.data.datasets[0].data = [
+                Math.ceil(target / 10),
+                Math.ceil(target / 32),
+                Math.ceil(target / 50),
+                Math.ceil(target / 100)
+            ];
+            protocolChartInstance.update();
+
+            // Update Storage Chart
+            storageChartInstance.data.datasets[0].data = [parseFloat(rawGb), parseFloat(cropGb)];
+            storageChartInstance.update();
+        }
+
+        // Command Builder Synthesizer
+        function generateCommand() {
+            const format = document.getElementById('cmdFormat').value;
+            const channel = document.getElementById('cmdChannel').value;
+            const duration = document.getElementById('cmdDuration').value;
+
+            let khmerTerm = "សេចក្តីថ្លែងការណ៍";
+            if(format === 'INTERVIEW') khmerTerm = "កិច្ចសម្ភាសន៍";
+            if(format === 'NEWS') khmerTerm = "ព័ត៌មានជាតិ";
+            if(format === 'FIELD') khmerTerm = "បទយកការណ៍";
+            if(format === 'EXECUTIVE') khmerTerm = "ប្រសាសន៍ដើម";
+
+            let channelHandle = "@cambodiaroyalgovernmentspo2555";
+            if(channel === 'TVK') channelHandle = "@tvkcambodia";
+            if(channel === 'MCS') channelHandle = "@MinistryofCivilService";
+            if(channel === 'BTV') channelHandle = "@btvnewstv";
+            if(channel === 'FRESH') channelHandle = "@freshnewsvideo";
+            if(channel === 'AMS') channelHandle = "@amscentral8552";
+
+            const script = `# Automated Khmer Video URL Extractor & Downloader Script
+# Target: ${khmerTerm} | Channel: ${channelHandle} | Max Duration: ${duration}s
+
+# 1. Extract matching video URLs directly into queue text file (no download):
+yt-dlp "ytsearchdate200:${khmerTerm} ${channelHandle}" \\
+  --flat-playlist \\
+  --match-filter "duration <= ${duration} & duration >= 45 & title !~= 'KUN KHMER|ប្រដាល់|រឿងភាគ'" \\
+  --print webpage_url > cambodia_urls_queue.txt
+
+# 2. Ingest HD video streams from queue:
+yt-dlp -a cambodia_urls_queue.txt \\
+  -f "bestvideo[height>=720][ext=mp4]+bestaudio[ext=m4a]/best[height>=720]" \\
+  -o "./raw_videos/%(uploader)s_%(id)s.%(ext)s" \\
+  --download-sections "*00:00:10-00:10:00"`;
+
+            document.getElementById('commandOutput').innerText = script;
+        }
+
+        // Copy Generated Command
+        function copyGeneratedCommand() {
+            const text = document.getElementById('commandOutput').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Copied terminal scraping command to clipboard!");
+        }
+    </script>
+</body>
+</html>
